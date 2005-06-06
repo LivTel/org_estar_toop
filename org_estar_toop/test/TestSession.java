@@ -1,5 +1,5 @@
 // TestSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.1 2005-06-06 17:46:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.2 2005-06-06 18:10:08 cjm Exp $
 package org.estar.toop.test;
 
 import java.io.*;
@@ -10,15 +10,28 @@ import org.estar.toop.*;
 
 /**
  * This class tests TOCSession.
+ * <pre>
+ * java org.estar.toop.test.TestSession -session_data &lt;property filename&gt;
+ *      -source &lt;object name&gt; -ra &lt;HH:MM:SS.ss&gt; -dec &lt;[+|-]DD:MM:SS.ss&gt;
+ *      -exposure_length &lt;milliseconds&gt; -exposure_count &lt;exposure count&gt;
+ *      -lower_filter &lt;filter type&gt; -upper_filter &lt;filter type&gt; -bin &lt;n&gt; [-help]
+ * </pre>
+ * e.g.:
+ * <pre>
+ * java org.estar.toop.test.TestSession -session_data ftnproxy_toop.properties 
+ *         -source "test" -ra 01:02:03 -dec +45:56:01 
+ *         -exposure_length 10000 -exposure_count 1 
+ *         -lower_filter SDSS-R -upper_filter clear -bin 2
+ * </pre>
  * @author Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestSession
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSession.java,v 1.1 2005-06-06 17:46:42 cjm Exp $";
+	public final static String RCSID = "$Id: TestSession.java,v 1.2 2005-06-06 18:10:08 cjm Exp $";
 	/**
 	 * The session reference.
 	 */
@@ -251,6 +264,20 @@ public class TestSession
 
 	/**
 	 * run method.
+	 * <ul>
+	 * <li>Checks input arguments for sensibleness.
+	 * <li>Loads session data if sessionDataFilename is non-null.
+	 * <li>Calls session <b>helo</b> method.
+	 * <li>Calls session <b>init</b> method.
+	 * <li>Calls session <b>slew</b> method.
+	 * <li>Calls session <b>instrRatcam</b> method.
+	 * <li>Calls session <b>expose</b> method.
+	 * <li>Uses session's <b>getExposeFilenameCount</b> and <b>getExposeFilename</b> methods to
+	 *     print out the exposure filenames returned.
+	 * <li>Finally calls session <b>quit</b> method.
+	 * </ul>
+	 * @see #sessionDataFilename
+	 * @see #sessionData
 	 * @see #session
 	 * @see #sourceID
 	 * @see #raString
@@ -323,4 +350,7 @@ public class TestSession
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/06/06 17:46:42  cjm
+** Initial revision
+**
 */
