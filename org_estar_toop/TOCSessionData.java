@@ -1,5 +1,5 @@
 // TOCSessionData.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSessionData.java,v 1.1 2005-06-06 14:44:49 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSessionData.java,v 1.2 2005-06-06 17:46:56 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -11,14 +11,14 @@ import ngat.util.logging.*;
 /** 
  * Looks after data associated with a target of oppurtunity control session
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-class TOCSessionData implements Logging
+public class TOCSessionData implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSessionData.java,v 1.1 2005-06-06 14:44:49 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSessionData.java,v 1.2 2005-06-06 17:46:56 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -236,4 +236,7 @@ class TOCSessionData implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/06/06 14:44:49  cjm
+** Initial revision
+**
 */
