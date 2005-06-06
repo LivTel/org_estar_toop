@@ -1,0 +1,167 @@
+// When.java
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/When.java,v 1.1 2005-06-06 14:44:40 cjm Exp $
+package org.estar.toop;
+
+import java.io.*;
+import java.util.*;
+
+import ngat.util.*;
+import ngat.util.logging.*;
+
+/** 
+ * When command implementation.
+ * @author Steve Fraser, Chris Mottram
+ * @version $Revision: 1.1 $
+ */
+class When extends TOCCommand implements Logging, Runnable
+{
+	/**
+	 * Revision control system version id.
+	 */
+	public final static String RCSID = "$Id: When.java,v 1.1 2005-06-06 14:44:40 cjm Exp $";
+	/**
+	 * Classname for logging.
+	 */
+	public static final String CLASS = "When";
+	/**
+	 * The command name.
+	 */
+	public static final String COMMAND_NAME = "WHEN";
+	/**
+	 * The number of seconds until the specified override can take charge of the telescope.
+	 */
+	protected int time = 0;
+	/**
+	 * The current service.
+	 */
+	protected String currentService = null;
+
+	/**
+	 * Default constructor.
+	 */
+	public When() 
+	{
+		super();
+	}
+
+	/**
+	 * Run method. 
+	 * Setup commandString.
+	 * Call TOCCommand.run.
+	 */
+	public void run()
+	{
+		commandString = new String(COMMAND_NAME+" "+sessionData.getServiceId());
+		super.run();
+		// diddly results
+		if(getSuccessful())
+		{
+			try
+			{
+				time = getReplyValueInt("Time");// in seconds
+				sessionData.setProperty(".when.time",""+time);
+				currentService = getReplyValue("Current");
+				sessionData.setProperty(".when.current_service",currentService);
+				logger.log(INFO, 1, CLASS, RCSID,"run","When successful with time : "+time+
+				   " seconds and current service : "+currentService+".");
+			}
+			catch(NGATPropertyException e)
+			{
+				successful = false;
+				errorString = new String(this.getClass().getName()+
+							 ":run:Parsing WHEN results failed:"+e);
+				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
+				logger.dumpStack(1,e);
+				return;
+			}
+		}
+		else
+		{
+			logger.log(INFO, 1, CLASS, RCSID,"run","When failed with error : "+getErrorString()+".");
+		}
+	}
+
+	/**
+	 * Return the number of seconds before this service can take control of the telescope.
+	 * @return A time in seconds.
+	 * @see #time
+	 */
+	public int getTime()
+	{
+		return time;
+	}
+	
+	/**
+	 * Return the current TOCS service in control of the telescope.
+	 * @return The current service
+	 * @see #currentService
+	 */
+	public String getCurrentService()
+	{
+		return currentService;
+	}
+
+	/**
+	 * Test main program.
+	 * @param args The argument list.
+	 */
+	public static void main(String args[])
+	{
+		TOCSessionData sessionData = null;
+		When when = null;
+		File propertiesFile = null;
+		Logger l = null;
+
+		if(args.length != 1)
+		{
+			System.out.println("java org.estar.toop.When <properties filename>");
+			System.exit(1);
+		}
+		propertiesFile = new File(args[0]);
+		// setup logger
+		ConsoleLogHandler console = new ConsoleLogHandler(new BasicLogFormatter(150));
+		console.setLogLevel(ALL);
+
+		l = LogManager.getLogger("org.estar.toop.TOCAClient");
+		l.setLogLevel(ALL);	
+		l.addHandler(console);
+		l = LogManager.getLogger("org.estar.toop.TOCCommand");
+		l.setLogLevel(ALL);	
+		l.addHandler(console);
+		l = LogManager.getLogger("org.estar.toop.When");
+		l.setLogLevel(ALL);	
+		l.addHandler(console);
+		l = LogManager.getLogger("org.estar.toop.TOCSessionData");
+		l.setLogLevel(ALL);	
+		l.addHandler(console);
+		// load session data
+		sessionData = new TOCSessionData();
+		try
+		{
+			sessionData.load(propertiesFile);
+		}
+		catch(Exception e)
+		{
+			System.err.println("Loading session data failed:"+e);
+			e.printStackTrace();
+			System.exit(1);
+		}
+		when = new When();
+		when.setSessionData(sessionData);
+		when.run();
+		if(when.getSuccessful())
+		{
+			System.out.println("Time we can next take control:"+when.getTime()+" seconds.");
+			System.out.println("Currently active service ID:"+when.getCurrentService()+".");
+		}
+		else
+		{
+			System.out.println("When failed:"+when.getErrorString()+".");
+		}
+		System.out.println("When finished.");
+		System.exit(0);
+	}
+}
+/*
+** $Log: not supported by cvs2svn $
+*/
