@@ -1,5 +1,5 @@
 // Expose.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.1 2005-06-06 16:01:13 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.2 2005-06-06 17:46:56 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import ngat.util.logging.*;
 /** 
  * Expose command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 class Expose extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Expose.java,v 1.1 2005-06-06 16:01:13 cjm Exp $";
+	public final static String RCSID = "$Id: Expose.java,v 1.2 2005-06-06 17:46:56 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -257,7 +257,7 @@ class Expose extends TOCCommand implements Logging, Runnable
 
 	/**
 	 * Return one of the FITS image filenames returned from the EXPOSE command.
-	 * NB It is possible for on IndexOutOfBoundsException or ClassCastException to occur.
+	 * NB It is possible for an IndexOutOfBoundsException or ClassCastException to occur.
 	 * @param i The index in the list of the filename to return. 
 	 * @return A FITS image filename. This filename exists on the <b>occ</b> machine, not the proxy machine.
 	 * @see #filenameList
@@ -430,4 +430,7 @@ class Expose extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/06/06 16:01:13  cjm
+** Initial revision
+**
 */
