@@ -1,5 +1,5 @@
 // Expose.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.2 2005-06-06 17:46:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.3 2005-06-07 13:27:58 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import ngat.util.logging.*;
 /** 
  * Expose command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 class Expose extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Expose.java,v 1.2 2005-06-06 17:46:56 cjm Exp $";
+	public final static String RCSID = "$Id: Expose.java,v 1.3 2005-06-07 13:27:58 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -124,7 +124,7 @@ class Expose extends TOCCommand implements Logging, Runnable
 	/**
 	 * Set the exposure start date.
 	 * Set <b>either</b> this or the exposure count - RUNATs can only have 1 exposure.
-	 * @param bd A date, the time the shutter should open.
+	 * @param d A date, the time the shutter should open.
 	 * @see #runatDate
 	 */
 	public void setRunatDate(Date d)
@@ -430,6 +430,9 @@ class Expose extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/06/06 17:46:56  cjm
+** Comment fix.
+**
 ** Revision 1.1  2005/06/06 16:01:13  cjm
 ** Initial revision
 **
