@@ -1,5 +1,5 @@
 // TestSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.3 2005-06-06 20:20:12 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.4 2005-06-07 13:35:05 cjm Exp $
 package org.estar.toop.test;
 
 import java.io.*;
@@ -26,14 +26,14 @@ import org.estar.toop.*;
  *         -lower_filter SDSS-R -upper_filter clear -bin 2
  * </pre>
  * @author Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TestSession
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSession.java,v 1.3 2005-06-06 20:20:12 cjm Exp $";
+	public final static String RCSID = "$Id: TestSession.java,v 1.4 2005-06-07 13:35:05 cjm Exp $";
 	/**
 	 * The session reference.
 	 */
@@ -265,7 +265,8 @@ public class TestSession
 	}
 
 	/**
-	 * Initialise loggers.
+	 * Initialise loggers. Uses session's initLoggers method.
+	 * @see #session
 	 */
 	public void initLoggers()
 	{
@@ -275,42 +276,7 @@ public class TestSession
 		console = new ConsoleLogHandler(new BasicLogFormatter(150));
 		console.setLogLevel(Logging.ALL);
 
-		l = LogManager.getLogger("org.estar.toop.TOCAClient");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.TOCCommand");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Expose");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Helo");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Init");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Instr");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Position");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Quit");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.Slew");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.When");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.TOCSessionData");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
-		l = LogManager.getLogger("org.estar.toop.TOCSession");
-		l.setLogLevel(Logging.ALL);	
-		l.addHandler(console);
+		session.initLoggers(console,Logging.ALL);
 	}
 
 	/**
@@ -411,6 +377,9 @@ public class TestSession
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/06/06 20:20:12  cjm
+** Added logging.
+**
 ** Revision 1.2  2005/06/06 18:10:08  cjm
 ** Added comments.
 **
