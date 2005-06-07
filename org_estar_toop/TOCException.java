@@ -1,5 +1,5 @@
 // TOCException.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCException.java,v 1.2 2005-06-07 13:36:40 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCException.java,v 1.3 2005-06-07 13:48:00 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -7,14 +7,14 @@ import java.io.*;
 /**
  * This class extends Exception. 
  * @author Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TOCException extends Exception
 {
 	/**
 	 * Revision Control System id string, showing the version of the Class
 	 */
-	public final static String RCSID = new String("$Id: TOCException.java,v 1.2 2005-06-07 13:36:40 cjm Exp $");
+	public final static String RCSID = new String("$Id: TOCException.java,v 1.3 2005-06-07 13:48:00 cjm Exp $");
 	/**
 	 * An exception that caused this exception to be generated.
 	 */
@@ -77,10 +77,26 @@ public class TOCException extends Exception
 		if(exception != null)
 			exception.printStackTrace(s);
 	}
+
+	/**
+	 * Overridden printStackTrace, that prints the creating exceptions stack if it is non-null.
+	 * NB printStackTrace() uses this method.
+	 * @param s The stream to write to.
+	 */
+	public void printStackTrace(PrintStream s)
+	{
+		super.printStackTrace(s);
+		if(exception != null)
+			exception.printStackTrace(s);
+	}
 }
 
 //
 // $Log: not supported by cvs2svn $
+// Revision 1.2  2005/06/07 13:36:40  cjm
+// Removed v1.4 specific code (Exception's constructor Exception(String,Exception)).
+// Added own exception wrapping code, overridden toString and printStackTrace.
+//
 // Revision 1.1  2005/06/06 17:46:56  cjm
 // Initial revision
 //
