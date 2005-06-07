@@ -1,5 +1,5 @@
 // TOCAClient.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCAClient.java,v 1.2 2005-06-07 13:27:51 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCAClient.java,v 1.3 2005-06-07 16:08:40 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import ngat.util.logging.*;
 /** 
  * Handles responses to commands sent via "Target of Opportunity Control Protocol" (TOCP).
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 class TOCAClient implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCAClient.java,v 1.2 2005-06-07 13:27:51 cjm Exp $";
+	public final static String RCSID = "$Id: TOCAClient.java,v 1.3 2005-06-07 16:08:40 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -318,6 +318,13 @@ class TOCAClient implements Logging, Runnable
 			throw new IllegalArgumentException(this.getClass().getName()+
 							   ":parseReply:reply string not OK:"+replyString);
 		}
+		// check for blank OK string, otherwise substring causes StringIndexOutOfBoundsException.
+		if(replyString.equals("OK "))
+		{
+			logger.log(INFO, 1, CLASS, RCSID,"parseReply",
+				   "TOCAClient::Reply string was empty.");
+			return;
+		}
 		// reset reply properties to empty.
 		replyProperties = new NGATProperties();
 		// remove OK from replyString and put into s.
@@ -330,17 +337,20 @@ class TOCAClient implements Logging, Runnable
 			// get rid of whitespace.
 			keywordValueString = keywordValueString.trim();
 			equalsIndex = keywordValueString.indexOf("=");
-			if(equalsIndex < 0)
+			if(equalsIndex > -1)
 			{
-				throw new IllegalArgumentException(this.getClass().getName()+
-					 ":parseReply:Illegal keyword value string:"+keywordValueString+
-								   " for reply string:"+replyString);
+				keyword = keywordValueString.substring(0,equalsIndex);
+				valueString = keywordValueString.substring(equalsIndex+1);
+				logger.log(INFO, 1, CLASS, RCSID,"parseReply","TOCAClient::Reply Keyword ["+keyword+
+					   "] has value ["+valueString+"]");
+				replyProperties.setProperty(keyword,valueString);
 			}
-			keyword = keywordValueString.substring(0,equalsIndex);
-			valueString = keywordValueString.substring(equalsIndex+1);
-			logger.log(INFO, 1, CLASS, RCSID,"parseReply","TOCAClient::Reply Keyword ["+keyword+
-				   "] has value ["+valueString+"]");
-			replyProperties.setProperty(keyword,valueString);
+			else
+			{
+				logger.log(INFO, 1, CLASS, RCSID,"parseReply",
+					   "TOCAClient::Reply Keyword/Value string ["+keywordValueString+
+					   "] has no comma, must not be keyword/value?");
+			}
 		}
 	}
 
@@ -391,6 +401,9 @@ class TOCAClient implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/06/07 13:27:51  cjm
+** Comment fix.
+**
 ** Revision 1.1  2005/06/06 14:45:00  cjm
 ** Initial revision
 **
