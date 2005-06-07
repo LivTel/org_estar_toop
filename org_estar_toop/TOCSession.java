@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.2 2005-06-07 13:34:32 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.3 2005-06-07 17:51:54 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -26,14 +26,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.2 2005-06-07 13:34:32 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.3 2005-06-07 17:51:54 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -54,6 +54,10 @@ public class TOCSession implements Logging
 	 * Position reference.
 	 */
 	private Position position = null;
+	/**
+	 * Status reference.
+	 */
+	private Status status = null;
 	/**
 	 * Helo reference.
 	 */
@@ -84,6 +88,7 @@ public class TOCSession implements Logging
 	 * @see #logger
 	 * @see #when
 	 * @see #position
+	 * @see #status
 	 * @see #helo
 	 * @see #init
 	 * @see #slew
@@ -97,6 +102,7 @@ public class TOCSession implements Logging
 		logger = LogManager.getLogger(this);
 		when = new When();
 		position  = new Position();
+		status = new Status();
 		helo = new Helo();
 		slew = new Slew();
 		init = new Init();
@@ -112,6 +118,7 @@ public class TOCSession implements Logging
 	 * @see #sessionData
 	 * @see #when
 	 * @see #position
+	 * @see #status
 	 * @see #helo
 	 * @see #init
 	 * @see #slew
@@ -124,6 +131,7 @@ public class TOCSession implements Logging
 		sessionData = d;
 		when.setSessionData(sessionData);
 		position.setSessionData(sessionData);
+		status.setSessionData(sessionData);
 		helo.setSessionData(sessionData);
 		slew.setSessionData(sessionData);
 		init.setSessionData(sessionData);
@@ -237,6 +245,30 @@ public class TOCSession implements Logging
 			throw new TOCException(this.getClass().getName()+":position failed:"+position.getErrorString());
 		}
 		return position.getState();
+	}
+
+	/**
+	 * Find out information about the telescope status.
+	 * You do not have to call the helo command before this one.
+	 * Further information from the results of this command can be got using getStatus.
+	 * @param category The status category e.g. METEO.
+	 * @param keyword The status keyword e.g. humidity.
+	 * @return A string, containing the value of the status e.g. "0.74".
+	 * @exception TOCException Thrown if the status command fails.
+	 * @see #getStatus
+	 * @see #status
+	 * @see #sessionData
+	 */
+	public String status(String category,String keyword) throws TOCException
+	{
+		status.setCategory(category);
+		status.setKeyword(keyword);
+		status.run();
+		if(status.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":status failed:"+status.getErrorString());
+		}
+		return status.getValue();
 	}
 
 	/**
@@ -494,6 +526,15 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Get the status command implementor.
+	 * @see #status
+	 */
+	public Status getStatus()
+	{
+		return status;
+	}
+
+	/**
 	 * Get the expose command implementor.
 	 * @see #expose
 	 */
@@ -525,6 +566,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/06/07 13:34:32  cjm
+** Added initLoggers.
+**
 ** Revision 1.1  2005/06/06 17:46:33  cjm
 ** Initial revision
 **
