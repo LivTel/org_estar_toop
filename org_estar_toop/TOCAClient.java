@@ -1,5 +1,5 @@
 // TOCAClient.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCAClient.java,v 1.3 2005-06-07 16:08:40 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCAClient.java,v 1.4 2005-06-08 09:59:50 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -12,14 +12,14 @@ import ngat.util.logging.*;
 /** 
  * Handles responses to commands sent via "Target of Opportunity Control Protocol" (TOCP).
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 class TOCAClient implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCAClient.java,v 1.3 2005-06-07 16:08:40 cjm Exp $";
+	public final static String RCSID = "$Id: TOCAClient.java,v 1.4 2005-06-08 09:59:50 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -154,6 +154,8 @@ class TOCAClient implements Logging, Runnable
 			catch (Exception e)
 			{
 				setError(true, "Failed to open connection to TOCS: "+e);
+				logger.log(INFO, 1, CLASS, RCSID,"run","Failed to open connection to TOCS: "+e);
+				logger.dumpStack(1,e);
 				return;
 			}
 			tc.sendLine(command);
@@ -178,6 +180,8 @@ class TOCAClient implements Logging, Runnable
 			catch (Exception e)
 			{
 				setError(true, "Failed to read TOCS response: "+e);
+				logger.log(INFO, 1, CLASS, RCSID,"run","Failed to read TOCS response: "+e);
+				logger.dumpStack(1,e);
 				return;
 			}	
 			setError(false, "Command accepted by TOCS");
@@ -185,6 +189,8 @@ class TOCAClient implements Logging, Runnable
 		catch (Exception e)
 		{
 			setError(true, "Failed to read TOCS response: "+e);
+			logger.log(INFO, 1, CLASS, RCSID,"run","Failed to read TOCS response: "+e);
+			logger.dumpStack(1,e);
 			return;		
 		}
 		finally
@@ -298,6 +304,8 @@ class TOCAClient implements Logging, Runnable
 	 * <li>timeRemaining, 4612
 	 * <li>priority, 2
 	 * </ul>
+	 * The string can also be "blank" i.e. "OK ", or just contain an informational string 
+	 * i.e. "OK Service terminated."
 	 * @exception IllegalArgumentException Thrown if the replyString is not formatted correctly.
 	 * @see #logger
 	 * @see #replyString
@@ -319,7 +327,8 @@ class TOCAClient implements Logging, Runnable
 							   ":parseReply:reply string not OK:"+replyString);
 		}
 		// check for blank OK string, otherwise substring causes StringIndexOutOfBoundsException.
-		if(replyString.equals("OK "))
+		// Note Init returns "OK ", but replyString.trim() is called before calling parseReply.
+		if(replyString.equals("OK ")||replyString.equals("OK"))
 		{
 			logger.log(INFO, 1, CLASS, RCSID,"parseReply",
 				   "TOCAClient::Reply string was empty.");
@@ -401,6 +410,10 @@ class TOCAClient implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/06/07 16:08:40  cjm
+** First fix for parseReply. Allows blank OK replies, and
+** replies containing just a string (no keyword/value pairs).
+**
 ** Revision 1.2  2005/06/07 13:27:51  cjm
 ** Comment fix.
 **
