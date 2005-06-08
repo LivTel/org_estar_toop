@@ -1,5 +1,5 @@
 // Auto.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Auto.java,v 1.1 2005-06-08 17:53:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Auto.java,v 1.2 2005-06-08 17:55:07 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -13,14 +13,14 @@ import org.estar.astrometry.*;
 /** 
  * Auto command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 class Auto extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Auto.java,v 1.1 2005-06-08 17:53:42 cjm Exp $";
+	public final static String RCSID = "$Id: Auto.java,v 1.2 2005-06-08 17:55:07 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -28,11 +28,11 @@ class Auto extends TOCCommand implements Logging, Runnable
 	/**
 	 * Option string value, to turn the autoguider on.
 	 */
-	public static final String OPTION_ON = "ON";
+	private static final String OPTION_ON = "ON";
 	/**
 	 * Option string value, to turn the autoguider off.
 	 */
-	public static final String OPTION_OFF = "OFF";
+	private static final String OPTION_OFF = "OFF";
 	/**
 	 * The command name.
 	 */
@@ -175,6 +175,9 @@ class Auto extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2005/06/08 17:53:42  cjm
+** Initial revision
+**
 ** Revision 1.1  2005/06/08 16:06:18  cjm
 ** Initial revision
 **
