@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.6 2005-06-08 17:53:35 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.7 2005-06-08 18:09:11 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.6 2005-06-08 17:53:35 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.7 2005-06-08 18:09:11 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -80,6 +80,10 @@ public class TOCSession implements Logging
 	 */
 	private Auto auto = null;
 	/**
+	 * AgRadial reference.
+	 */
+	private AgRadial agRadial = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -107,6 +111,7 @@ public class TOCSession implements Logging
 	 * @see #slew
 	 * @see #offset
 	 * @see #auto
+	 * @see #agRadial
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -125,6 +130,7 @@ public class TOCSession implements Logging
 		slew = new Slew();
 		offset = new Offset();
 		auto = new Auto();
+		agRadial = new AgRadial();
 		instr = new Instr();
 		expose = new Expose();
 		stop = new Stop();
@@ -143,6 +149,7 @@ public class TOCSession implements Logging
 	 * @see #slew
 	 * @see #offset
 	 * @see #auto
+	 * @see #agRadial
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -159,6 +166,7 @@ public class TOCSession implements Logging
 		slew.setSessionData(sessionData);
 		offset.setSessionData(sessionData);
 		auto.setSessionData(sessionData);
+		agRadial.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
@@ -197,6 +205,12 @@ public class TOCSession implements Logging
 		l = LogManager.getLogger("org.estar.toop.TOCCommand");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.AgRadial");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Auto");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Expose");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
@@ -209,6 +223,9 @@ public class TOCSession implements Logging
 		l = LogManager.getLogger("org.estar.toop.Instr");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Offset");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Position");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
@@ -216,6 +233,12 @@ public class TOCSession implements Logging
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Slew");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Status");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Stop");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.When");
@@ -404,6 +427,23 @@ public class TOCSession implements Logging
 		if(auto.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":auto failed:"+auto.getErrorString());
+		}
+	}
+
+	/**
+	 * Move the autoguider pick-off mirror to a specified position from the field edge.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param d The position from the edge of the field, in mm.
+	 * @exception TOCException Thrown if the agradial command fails.
+	 * @see #agRadial
+	 */
+	public void agradial(double d) throws TOCException
+	{
+		agRadial.setPosition(d);
+		agRadial.run();
+		if(agRadial.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":agradial failed:"+agRadial.getErrorString());
 		}
 	}
 
@@ -644,6 +684,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2005/06/08 17:53:35  cjm
+** Added auto method.
+**
 ** Revision 1.5  2005/06/08 16:16:10  cjm
 ** Added offset method.
 **
