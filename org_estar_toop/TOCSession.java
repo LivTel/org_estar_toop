@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.5 2005-06-08 16:16:10 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.6 2005-06-08 17:53:35 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.5 2005-06-08 16:16:10 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.6 2005-06-08 17:53:35 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -76,6 +76,10 @@ public class TOCSession implements Logging
 	 */
 	private Offset offset = null;
 	/**
+	 * Auto reference.
+	 */
+	private Auto auto = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -102,6 +106,7 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #auto
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -119,6 +124,7 @@ public class TOCSession implements Logging
 		init = new Init();
 		slew = new Slew();
 		offset = new Offset();
+		auto = new Auto();
 		instr = new Instr();
 		expose = new Expose();
 		stop = new Stop();
@@ -136,6 +142,7 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #auto
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -151,6 +158,7 @@ public class TOCSession implements Logging
 		init.setSessionData(sessionData);
 		slew.setSessionData(sessionData);
 		offset.setSessionData(sessionData);
+		auto.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
@@ -376,6 +384,26 @@ public class TOCSession implements Logging
 		if(offset.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":offset failed:"+offset.getErrorString());
+		}
+	}
+
+	/**
+	 * Switch the autoguider on or off after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> and <b>slew</b> before this method. 
+	 * @param on A boolean, if "true" turn the autoguider on, otherwise turn it off.
+	 * @exception TOCException Thrown if the auto command fails.
+	 * @see #auto
+	 */
+	public void auto(boolean on) throws TOCException
+	{
+		if(on)
+			auto.setOn();
+		else
+			auto.setOff();
+		auto.run();
+		if(auto.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":auto failed:"+auto.getErrorString());
 		}
 	}
 
@@ -616,6 +644,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2005/06/08 16:16:10  cjm
+** Added offset method.
+**
 ** Revision 1.4  2005/06/08 15:45:11  cjm
 ** Added stop method.
 **
