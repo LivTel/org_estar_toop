@@ -1,5 +1,5 @@
 // TestSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.4 2005-06-07 13:35:05 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.5 2005-06-08 15:45:25 cjm Exp $
 package org.estar.toop.test;
 
 import java.io.*;
@@ -26,14 +26,14 @@ import org.estar.toop.*;
  *         -lower_filter SDSS-R -upper_filter clear -bin 2
  * </pre>
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TestSession
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSession.java,v 1.4 2005-06-07 13:35:05 cjm Exp $";
+	public final static String RCSID = "$Id: TestSession.java,v 1.5 2005-06-08 15:45:25 cjm Exp $";
 	/**
 	 * The session reference.
 	 */
@@ -291,6 +291,7 @@ public class TestSession
 	 * <li>Calls session <b>expose</b> method.
 	 * <li>Uses session's <b>getExposeFilenameCount</b> and <b>getExposeFilename</b> methods to
 	 *     print out the exposure filenames returned.
+	 * <li>Calls session <b>stop</b> method, to stop the telescope tracking.
 	 * <li>Finally calls session <b>quit</b> method.
 	 * </ul>
 	 * @see #sessionDataFilename
@@ -331,6 +332,7 @@ public class TestSession
 			session.expose(exposureLength,exposureCount,true);
 			for(int i = 0;i < session.getExposeFilenameCount(); i++)
 				System.out.println(""+i+" "+session.getExposeFilename(i));
+			session.stop();
 		}
 		catch(Exception e)
 		{
@@ -377,6 +379,9 @@ public class TestSession
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/06/07 13:35:05  cjm
+** Changed initLoggers.
+**
 ** Revision 1.3  2005/06/06 20:20:12  cjm
 ** Added logging.
 **
