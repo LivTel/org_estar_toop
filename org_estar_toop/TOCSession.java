@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.3 2005-06-07 17:51:54 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.4 2005-06-08 15:45:11 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -23,17 +23,18 @@ import org.estar.astrometry.*;
  * ts.expose(10000,1,true);
  * for(int i = 0;i < ts.getExposeFilenameCount(); i++)
  *     System.out.println(""+i+" "+ts.getExposeFilename(i));
+ * ts.stop();
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.3 2005-06-07 17:51:54 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.4 2005-06-08 15:45:11 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -79,6 +80,10 @@ public class TOCSession implements Logging
 	 */
 	private Expose expose = null;
 	/**
+	 * Stop reference.
+	 */
+	private Stop stop = null;
+	/**
 	 * Quit reference.
 	 */
 	private Quit quit = null;
@@ -94,6 +99,7 @@ public class TOCSession implements Logging
 	 * @see #slew
 	 * @see #instr
 	 * @see #expose
+	 * @see #stop
 	 * @see #quit
 	 */
 	public TOCSession() 
@@ -109,6 +115,7 @@ public class TOCSession implements Logging
 		slew = new Slew();
 		instr = new Instr();
 		expose = new Expose();
+		stop = new Stop();
 		quit = new Quit();
 	}
 
@@ -124,6 +131,7 @@ public class TOCSession implements Logging
 	 * @see #slew
 	 * @see #instr
 	 * @see #expose
+	 * @see #stop
 	 * @see #quit
 	 */
 	public void setSessionData(TOCSessionData d)
@@ -138,6 +146,7 @@ public class TOCSession implements Logging
 		slew.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
+		stop.setSessionData(sessionData);
 		quit.setSessionData(sessionData);
 	}
 
@@ -474,6 +483,21 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Stop the telescope, if it is slewing/tracking.
+	 * You should have called <b>helo</b> before this method. 
+	 * @exception TOCException Thrown if the stop command fails.
+	 * @see #stop
+	 */
+	public void stop() throws TOCException
+	{
+		stop.run();
+		if(stop.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":stop failed:"+stop.getErrorString());
+		}
+	}
+
+	/**
 	 * Quit a RCS TOCA session.
 	 * You should have called <b>helo</b> before this method. 
 	 * @exception TOCException Thrown if the quit command fails.
@@ -566,6 +590,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/06/07 17:51:54  cjm
+** Added status.
+**
 ** Revision 1.2  2005/06/07 13:34:32  cjm
 ** Added initLoggers.
 **
