@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.4 2005-06-08 15:45:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.5 2005-06-08 16:16:10 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.4 2005-06-08 15:45:11 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.5 2005-06-08 16:16:10 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -72,6 +72,10 @@ public class TOCSession implements Logging
 	 */
 	private Slew slew = null;
 	/**
+	 * Offset reference.
+	 */
+	private Offset offset = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -97,6 +101,7 @@ public class TOCSession implements Logging
 	 * @see #helo
 	 * @see #init
 	 * @see #slew
+	 * @see #offset
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -113,6 +118,7 @@ public class TOCSession implements Logging
 		slew = new Slew();
 		init = new Init();
 		slew = new Slew();
+		offset = new Offset();
 		instr = new Instr();
 		expose = new Expose();
 		stop = new Stop();
@@ -129,6 +135,7 @@ public class TOCSession implements Logging
 	 * @see #helo
 	 * @see #init
 	 * @see #slew
+	 * @see #offset
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -141,9 +148,9 @@ public class TOCSession implements Logging
 		position.setSessionData(sessionData);
 		status.setSessionData(sessionData);
 		helo.setSessionData(sessionData);
-		slew.setSessionData(sessionData);
 		init.setSessionData(sessionData);
 		slew.setSessionData(sessionData);
+		offset.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
@@ -350,6 +357,25 @@ public class TOCSession implements Logging
 		if(slew.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":slew failed:"+slew.getErrorString());
+		}
+	}
+
+	/**
+	 * Offset the telescope after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> and <b>slew</b> before this method. 
+	 * @param dRA The right ascension offset in arcseconds.
+	 * @param dDec The declination offset in arcseconds.
+	 * @exception TOCException Thrown if the offset command fails.
+	 * @see #offset
+	 */
+	public void offset(double dRA, double dDec) throws TOCException
+	{
+		offset.setDRA(dRA);
+		offset.setDDec(dDec);
+		offset.run();
+		if(offset.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":offset failed:"+offset.getErrorString());
 		}
 	}
 
@@ -590,6 +616,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/06/08 15:45:11  cjm
+** Added stop method.
+**
 ** Revision 1.3  2005/06/07 17:51:54  cjm
 ** Added status.
 **
