@@ -1,5 +1,5 @@
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.7 2005-06-08 18:09:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.8 2005-06-15 14:35:30 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -27,14 +27,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.7 2005-06-08 18:09:11 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.8 2005-06-15 14:35:30 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -189,68 +189,6 @@ public class TOCSession implements Logging
 		setSessionData(sessionData);
 	}
 
-
-	/**
-	 * Initialise org.estar.toop loggers.
-	 * @param handler The log handler to point the loggers to.
-	 * @param logLevel The log level to set the loggers to.
-	 */
-	public void initLoggers(LogHandler handler,int logLevel)
-	{
-		Logger l = null;
-
-		l = LogManager.getLogger("org.estar.toop.TOCAClient");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.TOCCommand");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.AgRadial");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Auto");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Expose");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Helo");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Init");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Instr");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Offset");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Position");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Quit");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Slew");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Status");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.Stop");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.When");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.TOCSessionData");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-		l = LogManager.getLogger("org.estar.toop.TOCSession");
-		l.setLogLevel(logLevel);	
-		l.addHandler(handler);
-	}
 
 	/**
 	 * Find out when a helo command will next succeed.
@@ -681,9 +619,74 @@ public class TOCSession implements Logging
 	{
 		return expose.getFilename(i);
 	}
+
+	/**
+	 * Initialise org.estar.toop loggers. A static method - no session has to be instantiated to call this.
+	 * @param handler The log handler to point the loggers to.
+	 * @param logLevel The log level to set the loggers to.
+	 */
+	public static void initLoggers(LogHandler handler,int logLevel)
+	{
+		Logger l = null;
+
+		l = LogManager.getLogger("org.estar.toop.TOCAClient");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.TOCCommand");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.AgRadial");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Auto");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Expose");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Helo");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Init");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Instr");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Offset");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Position");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Quit");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Slew");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Status");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Stop");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.When");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.TOCSessionData");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.TOCSession");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2005/06/08 18:09:11  cjm
+** Added agradial method.
+**
 ** Revision 1.6  2005/06/08 17:53:35  cjm
 ** Added auto method.
 **
