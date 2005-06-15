@@ -1,5 +1,5 @@
 // Position.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Position.java,v 1.2 2005-06-06 17:46:56 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Position.java,v 1.3 2005-06-15 12:05:03 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -13,14 +13,14 @@ import org.estar.astrometry.*;
 /** 
  * Position command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-class Position extends TOCCommand implements Logging, Runnable
+public class Position extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Position.java,v 1.2 2005-06-06 17:46:56 cjm Exp $";
+	public final static String RCSID = "$Id: Position.java,v 1.3 2005-06-15 12:05:03 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -29,6 +29,16 @@ class Position extends TOCCommand implements Logging, Runnable
 	 * The command name.
 	 */
 	public static final String COMMAND_NAME = "POSITION";
+	/**
+	 * Position state returned from the position command.
+	 * @see #state
+	 */
+	public static final String POSITION_STATE_RISEN = "RISEN";
+	/**
+	 * Position state returned from the position command.
+	 * @see #state
+	 */
+	public static final String POSITION_STATE_SET = "SET";
 	/**
 	 * Input into the position command, the Right Ascension.
 	 */
@@ -324,6 +334,9 @@ class Position extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2005/06/06 17:46:56  cjm
+** Comment fix.
+**
 ** Revision 1.1  2005/06/06 14:45:12  cjm
 ** Initial revision
 **
