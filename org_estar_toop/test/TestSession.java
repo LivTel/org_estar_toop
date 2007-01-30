@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.toop.
+
+    org.estar.toop is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.toop is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.toop; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // TestSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.5 2005-06-08 15:45:25 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/TestSession.java,v 1.6 2007-01-30 18:35:47 cjm Exp $
 package org.estar.toop.test;
 
 import java.io.*;
@@ -26,14 +45,14 @@ import org.estar.toop.*;
  *         -lower_filter SDSS-R -upper_filter clear -bin 2
  * </pre>
  * @author Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class TestSession
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSession.java,v 1.5 2005-06-08 15:45:25 cjm Exp $";
+	public final static String RCSID = "$Id: TestSession.java,v 1.6 2007-01-30 18:35:47 cjm Exp $";
 	/**
 	 * The session reference.
 	 */
@@ -379,6 +398,9 @@ public class TestSession
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2005/06/08 15:45:25  cjm
+** Added call to stop.
+**
 ** Revision 1.4  2005/06/07 13:35:05  cjm
 ** Changed initLoggers.
 **

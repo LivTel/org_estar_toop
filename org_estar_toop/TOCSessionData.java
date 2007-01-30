@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.toop.
+
+    org.estar.toop is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.toop is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.toop; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // TOCSessionData.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSessionData.java,v 1.3 2005-06-14 12:40:45 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSessionData.java,v 1.4 2007-01-30 18:35:33 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -11,14 +30,14 @@ import ngat.util.logging.*;
 /** 
  * Looks after data associated with a target of oppurtunity control session
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TOCSessionData implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSessionData.java,v 1.3 2005-06-14 12:40:45 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSessionData.java,v 1.4 2007-01-30 18:35:33 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -246,6 +265,9 @@ public class TOCSessionData implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2005/06/14 12:40:45  cjm
+** Added set method.
+**
 ** Revision 1.2  2005/06/06 17:46:56  cjm
 ** Made class public.
 **

@@ -1,5 +1,24 @@
+/*   
+    Copyright 2006, Astrophysics Research Institute, Liverpool John Moores University.
+
+    This file is part of org.estar.toop.
+
+    org.estar.toop is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    org.estar.toop is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with org.estar.toop; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 // Expose.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.4 2005-06-15 16:56:18 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Expose.java,v 1.5 2007-01-30 18:35:22 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -12,14 +31,14 @@ import ngat.util.logging.*;
 /** 
  * Expose command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class Expose extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Expose.java,v 1.4 2005-06-15 16:56:18 cjm Exp $";
+	public final static String RCSID = "$Id: Expose.java,v 1.5 2007-01-30 18:35:22 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -430,6 +449,9 @@ public class Expose extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2005/06/15 16:56:18  cjm
+** Made expose public so return filenames can be retrieved.
+**
 ** Revision 1.3  2005/06/07 13:27:58  cjm
 ** Comment fix.
 **
