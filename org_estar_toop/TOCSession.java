@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.9 2007-01-30 18:35:34 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.10 2007-04-25 10:34:06 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.9 2007-01-30 18:35:34 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.10 2007-04-25 10:34:06 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -488,6 +488,22 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the RINGOSTAR instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param xBin How to bin the chip in X.
+	 * @param yBin How to bin the chip in Y.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrRingoStar(int xBin,int yBin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr("RINGO",null,null,null,xBin,yBin,calibrateBefore,calibrateAfter);
+	}
+
+	/**
 	 * Take a MULTRUN exposure.
 	 * You should have called <b>helo</b>, <b>slew</b> and <b>instr</b> before this method. 
 	 * @param exposureLength The length of each exposure in milliseconds
@@ -703,6 +719,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2007/01/30 18:35:34  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.8  2005/06/15 14:35:30  cjm
 ** Changed initLoggers to static.
 **
