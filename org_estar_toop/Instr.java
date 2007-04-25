@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.2 2007-01-30 18:35:25 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.3 2007-04-25 10:33:41 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.2 2007-01-30 18:35:25 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.3 2007-04-25 10:33:41 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -228,6 +228,10 @@ class Instr extends TOCCommand implements Logging, Runnable
 		{
 			commandString = new String(commandString+xBinning+" "+yBinning);
 		}
+		else if(instID.equals("RINGO"))
+		{
+			commandString = new String(commandString+xBinning+" "+yBinning);
+		}
 		else
 		{
 			successful = false;
@@ -394,6 +398,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.2  2007/01/30 18:35:25  cjm
+** gnuify: Added GNU General Public License.
+**
 ** Revision 1.1  2005/06/06 14:45:16  cjm
 ** Initial revision
 **
