@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.3 2007-04-25 10:33:41 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.4 2008-03-26 15:00:30 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.3 2007-04-25 10:33:41 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.4 2008-03-26 15:00:30 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -47,23 +47,36 @@ class Instr extends TOCCommand implements Logging, Runnable
 	/**
 	 * The command name.
 	 */
-	public static final String COMMAND_NAME = "INSTR";
+	public final static String COMMAND_NAME = "INSTR";
 	/**
-	 * The instrument name - RATCAM, FIXEDSPEC or IRCAM.
+	 * The maximum number of filters that can be specified.
+	 */
+	public final static int FILTER_LIST_COUNT = 3;
+	/**
+	 * The index in the list of the lower filter.
+	 */
+	public final static int LOWER_FILTER_INDEX = 0;
+	/**
+	 * The index in the list of the upper filter.
+	 */
+	public final static int UPPER_FILTER_INDEX = 1;
+	/**
+	 * The index in the list of the IR filter.
+	 */
+	public final static int IR_FILTER_INDEX = 0;
+	/**
+	 * The index in the filter list of the NUVSPEC central wavelength.
+	 * Although not really a filter it is the NUVSPEC equivalent.
+	 */
+	public final static int NUVIEW_WAVELENGTH_FILTER_INDEX = 0;
+	/**
+	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE.
 	 */
 	protected String instID = null;
 	/**
-	 * If the instrument is RATCAM, the lower filter configuration.
+	 * A list of filters to configure the instrument.
 	 */
-	protected String lowerFilter = null;
-	/**
-	 * If the instrument is RATCAM, the upper filter configuration.
-	 */
-	protected String upperFilter = null;
-	/**
-	 * If the instrument is IRCAM, the filter configuration.
-	 */
-	protected String irFilter = null;
+	protected String filterList[] = new String[FILTER_LIST_COUNT];
 	/**
 	 * Input into the instr command, the x binning.
 	 */
@@ -100,33 +113,66 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
-	 * Set the input lower filter to the INSTR command (for RATCAM only).
-	 * @param s A filter type.
-	 * @see #lowerFilter
+	 * Set the input lower filter to the INSTR command (for RATCAM/EA01 only).
+	 * @param s A filter type, e.g. SDSS-R.
+	 * @see #setFilter
+	 * @see #LOWER_FILTER_INDEX
 	 */
 	public void setLowerFilter(String s)
 	{
-		lowerFilter = s;
+		setFilter(LOWER_FILTER_INDEX,s);
 	}
 
 	/**
-	 * Set the input upper filter to the INSTR command (for RATCAM only).
-	 * @param s A filter type.
-	 * @see #upperFilter
+	 * Set the input upper filter to the INSTR command (for RATCAM/EA01 only).
+	 * @param s A filter type, e.g. SDSS-I, clear.
+	 * @see #setFilter
+	 * @see #UPPER_FILTER_INDEX
 	 */
 	public void setUpperFilter(String s)
 	{
-		upperFilter = s;
+		setFilter(UPPER_FILTER_INDEX,s);
 	}
 
 	/**
 	 * Set the input filter to the INSTR command (for IRCAM only).
-	 * @param s A filter type.
-	 * @see #irFilter
+	 * @param s A filter type, e.g. Barr-J.
+	 * @see #setFilter
+	 * @see #IR_FILTER_INDEX
 	 */
 	public void setIRFilter(String s)
 	{
-		irFilter = s;
+		setFilter(IR_FILTER_INDEX,s);
+	}
+
+	/**
+	 * Set the central wavelength of the INSTR command, when configuring NUVSPEC
+	 * @param s The central wavelength, as a string, e.g "4690.2", "6182.6", "7291.6" 
+	 *          (NUVSPEC standard wavelengths).
+	 * @see #setFilter
+	 * @see #NUVIEW_WAVELENGTH_FILTER_INDEX
+	 */
+	public void setWavelength(String s)
+	{
+		setFilter(NUVIEW_WAVELENGTH_FILTER_INDEX,s);
+	}
+
+	/**
+	 * Set a filter to the INSTR command.
+	 * @param index The index in the filter list of this filter.
+	 * @param s A filter type.
+	 * @exception IllegalArgumentException Thrown if index is out of range 0..FILTER_LIST_COUNT.
+	 * @see #filterList
+	 * @see #FILTER_LIST_COUNT
+	 */
+	public void setFilter(int index,String s) throws IllegalArgumentException
+	{
+		if((index < 0) || (index >= FILTER_LIST_COUNT))
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setFilter:Illegal filter Index:"+index);
+		}
+		filterList[index] = s;
 	}
 
 	/**
@@ -186,9 +232,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #yBinning
 	 * @see #calibrateBefore
 	 * @see #calibrateAfter
-	 * @see #lowerFilter
-	 * @see #upperFilter
-	 * @see #irFilter
+	 * @see #filterList
 	 * @see #sessionData
 	 * @see #logger
 	 * @see #successful
@@ -198,7 +242,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	{
 		// common start bits
 		commandString = new String(COMMAND_NAME+" "+sessionData.getSessionId()+" "+instID+" ");
-		if(instID.equals("RATCAM"))
+		if(instID.equals("RATCAM")||instID.equals("HAWKCAM")||instID.equals("EA01"))
 		{
 			if(xBinning != yBinning)
 			{
@@ -209,7 +253,22 @@ class Instr extends TOCCommand implements Logging, Runnable
 				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
 				return;
 			}
-			commandString = new String(commandString+lowerFilter+" "+upperFilter+" "+xBinning);
+			commandString = new String(commandString+filterList[LOWER_FILTER_INDEX]+" "+
+						   filterList[UPPER_FILTER_INDEX]+" "+xBinning);
+		}
+		else if(instID.equals("EM01"))
+		{
+			if(xBinning != yBinning)
+			{
+				successful = false;
+				errorString = new String(this.getClass().getName()+
+							 ":run:X binning "+xBinning+" does not match Y binning "+
+							 yBinning+".");
+				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
+				return;
+			}
+			commandString = new String(commandString+filterList[0]+" "+filterList[1]+" "+filterList[2]+
+						   " "+xBinning);
 		}
 		else if(instID.equals("IRCAM"))
 		{
@@ -222,13 +281,17 @@ class Instr extends TOCCommand implements Logging, Runnable
 				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
 				return;
 			}
-			commandString = new String(commandString+irFilter+" "+xBinning);
+			commandString = new String(commandString+filterList[IR_FILTER_INDEX]+" "+xBinning);
 		}
 		else if(instID.equals("FIXEDSPEC"))
 		{
 			commandString = new String(commandString+xBinning+" "+yBinning);
 		}
-		else if(instID.equals("RINGO"))
+		else if(instID.equals("NUVSPEC"))
+		{
+			commandString = new String(commandString+filterList[NUVIEW_WAVELENGTH_FILTER_INDEX]);
+		}
+		else if(instID.equals("RINGO")||instID.equals("RINGOSTAR")||instID.equals("GROPE"))
 		{
 			commandString = new String(commandString+xBinning+" "+yBinning);
 		}
@@ -240,16 +303,20 @@ class Instr extends TOCCommand implements Logging, Runnable
 			logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
 			return;
 		}
-		// common end bits
-		commandString = new String(commandString+" ");
-		if(calibrateBefore)
-			commandString = new String(commandString+"T");
-		else
-			commandString = new String(commandString+"F");
-		if(calibrateAfter)
-			commandString = new String(commandString+"T");
-		else
-			commandString = new String(commandString+"F");
+		if(instID.equals("EM01") == false)// does not apply to Merope
+		{
+			// common end bits
+			commandString = new String(commandString+" ");
+			if(calibrateBefore)
+				commandString = new String(commandString+"T");
+			else
+				commandString = new String(commandString+"F");
+			if(calibrateAfter)
+				commandString = new String(commandString+"T");
+			else
+				commandString = new String(commandString+"F");
+		}
+		// run the INSTR command
 		super.run();
 		// results
 		if(getSuccessful())
@@ -398,6 +465,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.3  2007/04/25 10:33:41  cjm
+** Added RINGO instrument support.
+**
 ** Revision 1.2  2007/01/30 18:35:25  cjm
 ** gnuify: Added GNU General Public License.
 **
