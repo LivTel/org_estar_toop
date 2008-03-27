@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.11 2008-03-27 12:50:59 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.12 2008-03-27 19:44:39 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.11 2008-03-27 12:50:59 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.12 2008-03-27 19:44:39 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -103,6 +103,10 @@ public class TOCSession implements Logging
 	 */
 	private AgRadial agRadial = null;
 	/**
+	 * Acquire reference.
+	 */
+	private Acquire acquire = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -131,6 +135,7 @@ public class TOCSession implements Logging
 	 * @see #offset
 	 * @see #auto
 	 * @see #agRadial
+	 * @see #acquire
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -150,6 +155,7 @@ public class TOCSession implements Logging
 		offset = new Offset();
 		auto = new Auto();
 		agRadial = new AgRadial();
+		acquire = new Acquire();
 		instr = new Instr();
 		expose = new Expose();
 		stop = new Stop();
@@ -169,6 +175,7 @@ public class TOCSession implements Logging
 	 * @see #offset
 	 * @see #auto
 	 * @see #agRadial
+	 * @see #acquire
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -186,6 +193,7 @@ public class TOCSession implements Logging
 		offset.setSessionData(sessionData);
 		auto.setSessionData(sessionData);
 		agRadial.setSessionData(sessionData);
+		acquire.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
@@ -401,6 +409,56 @@ public class TOCSession implements Logging
 		if(agRadial.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":agradial failed:"+agRadial.getErrorString());
+		}
+	}
+
+	/**
+	 * Acquire the telescope after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param ra The right ascension to acquire to.
+	 * @param dec The declination to acquire to.
+	 * @param acquireMode Which method to use to acquire.
+	 * @exception TOCException Thrown if the slew command fails.
+	 * @see #acquire
+	 * @see Acquire#ACQUIRE_MODE_NONE
+	 * @see Acquire##ACQUIRE_MODE_BRIGHTEST
+	 * @see Acquire##ACQUIRE_MODE_WCS
+	 */
+	public void acquire(RA ra,Dec dec,String acquireMode) throws TOCException
+	{
+		acquire.setRA(ra);
+		acquire.setDec(dec);
+		acquire.setAcquireMode(acquireMode);
+		acquire.run();
+		if(acquire.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":acquire failed:"+acquire.getErrorString());
+		}
+	}
+
+	/**
+	 * Acquire the telescope after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param raString A string representing the right ascension, in the format HH:MM:SS.ss.
+	 * @param decString A string representing the declination, in the format [+|-]DD:MM:SS.ss.
+	 * @param acquireMode Which method to use to acquire.
+	 * @exception TOCException Thrown if the slew command fails.
+	 * @exception NumberFormatException Thrown if the RA/Dec parsing fails.
+	 * @see #acquire
+	 * @see Acquire#ACQUIRE_MODE_NONE
+	 * @see Acquire##ACQUIRE_MODE_BRIGHTEST
+	 * @see Acquire##ACQUIRE_MODE_WCS
+	 */
+	public void acquire(String raString,String decString,String acquireMode) throws TOCException, 
+											NumberFormatException
+	{
+		acquire.setRA(raString);
+		acquire.setDec(decString);
+		acquire.setAcquireMode(acquireMode);
+		acquire.run();
+		if(acquire.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":acquire failed:"+acquire.getErrorString());
 		}
 	}
 
@@ -739,6 +797,9 @@ public class TOCSession implements Logging
 		l = LogManager.getLogger("org.estar.toop.TOCCommand");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Acquire");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.AgRadial");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
@@ -788,6 +849,11 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.11  2008/03/27 12:50:59  cjm
+** Rewrote instr command, now has 3 generic filters.
+** Added instrImager to specify inst name.
+** Added instrMerope,instrRISE,instrMeaburnSpec.
+**
 ** Revision 1.10  2007/04/25 10:34:06  cjm
 ** Added instrRingoStar method for RINGO instrument support.
 **
