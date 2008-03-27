@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.4 2008-03-26 15:00:30 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.5 2008-03-27 12:42:20 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.4 2008-03-26 15:00:30 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.5 2008-03-27 12:42:20 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -242,7 +242,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	{
 		// common start bits
 		commandString = new String(COMMAND_NAME+" "+sessionData.getSessionId()+" "+instID+" ");
-		if(instID.equals("RATCAM")||instID.equals("HAWKCAM")||instID.equals("EA01"))
+		if(instID.equals("RATCAM")||instID.equals("HAWKCAM")||instID.equals("EA01")||instID.equals("EA02"))
 		{
 			if(xBinning != yBinning)
 			{
@@ -256,7 +256,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 			commandString = new String(commandString+filterList[LOWER_FILTER_INDEX]+" "+
 						   filterList[UPPER_FILTER_INDEX]+" "+xBinning);
 		}
-		else if(instID.equals("EM01"))
+		else if(instID.equals("EM01")||instID.equals("EM02"))
 		{
 			if(xBinning != yBinning)
 			{
@@ -269,6 +269,19 @@ class Instr extends TOCCommand implements Logging, Runnable
 			}
 			commandString = new String(commandString+filterList[0]+" "+filterList[1]+" "+filterList[2]+
 						   " "+xBinning);
+		}
+		else if(instID.equals("RISE"))
+		{
+			if(xBinning != yBinning)
+			{
+				successful = false;
+				errorString = new String(this.getClass().getName()+
+							 ":run:X binning "+xBinning+" does not match Y binning "+
+							 yBinning+".");
+				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
+				return;
+			}
+			commandString = new String(commandString+xBinning);
 		}
 		else if(instID.equals("IRCAM"))
 		{
@@ -465,6 +478,10 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.4  2008/03/26 15:00:30  cjm
+** Changed filter handling to be list based.
+** Added Merope (EM01), EA01, and NUVSPEC implementations.
+**
 ** Revision 1.3  2007/04/25 10:33:41  cjm
 ** Added RINGO instrument support.
 **
