@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.10 2007-04-25 10:34:06 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.11 2008-03-27 12:50:59 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.10 2007-04-25 10:34:06 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.11 2008-03-27 12:50:59 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -408,9 +408,11 @@ public class TOCSession implements Logging
 	 * Configure an instrument, and make it the current TOCA instrument.
 	 * You should have called <b>helo</b> before this method. 
 	 * @param instID The ID of the instrument.
-	 * @param lowerFilterType A string representing the lower filter type string, i.e. SDSS-R.
-	 * @param upperFilterType A string representing the upper filter type string, i.e. clear.
-	 * @param irFilterType A string representing the IR type string, i.e. Barr-J.
+	 * @param filter0 A string representing a filter type string, i.e. SDSS-R. Used for RATCAM lower filter,
+	 *                IR filter type, NUVSPEC wavelength (string), EM01 filter 0.
+	 * @param filter1 A string representing a filter type string, i.e. clear. Used for RATCAM upper filter, 
+	 *                EM01 filter 1.
+	 * @param filter2 A string representing a filter type string, i.e. clear. Used for EM01 filter 2.
 	 * @param xBin How to bin the chip in X.
 	 * @param yBin How to bin the chip in Y.
 	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually false.
@@ -418,13 +420,13 @@ public class TOCSession implements Logging
 	 * @exception TOCException Thrown if the instr command fails.
 	 * @see #instr
 	 */
-	public void instr(String instID,String lowerFilterType,String upperFilterType,String irFilterType,
+	public void instr(String instID,String filter0,String filter1,String filter2,
 			  int xBin,int yBin,boolean calibrateBefore,boolean calibrateAfter) throws TOCException
 	{
 		instr.setInstId(instID);
-		instr.setLowerFilter(lowerFilterType);
-		instr.setUpperFilter(upperFilterType);
-		instr.setIRFilter(irFilterType);
+		instr.setFilter(0,filter0);
+		instr.setFilter(1,filter1);
+		instr.setFilter(2,filter2);
 		instr.setXBinning(xBin);
 		instr.setYBinning(yBin);
 		instr.setCalibrateBefore(calibrateBefore);
@@ -445,13 +447,64 @@ public class TOCSession implements Logging
 	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually false.
 	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually false.
 	 * @exception TOCException Thrown if the instr command fails.
-	 * @see #instr
+	 * @see #instrImager
 	 */
 	public void instrRatcam(String lowerFilterType,String upperFilterType,int bin,
 				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
 	{
-		instr("RATCAM",lowerFilterType,upperFilterType,null,
+		instrImager("RATCAM",lowerFilterType,upperFilterType,bin,calibrateBefore,calibrateAfter);
+	}
+
+	/**
+	 * Configure a standard 2 wheel imager instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param instrumentName Which particular instrument name to use (RATCAM, EA01).
+	 * @param lowerFilterType A string representing the lower filter type string, i.e. SDSS-R.
+	 * @param upperFilterType A string representing the upper filter type string, i.e. clear.
+	 * @param bin How to bin the chip, usually use 2.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually false.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually false.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrImager(String instrumentName, String lowerFilterType,String upperFilterType,int bin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr(instrumentName,lowerFilterType,upperFilterType,null,
 		      bin,bin,calibrateBefore,calibrateAfter);
+	}
+
+	/**
+	 * Configure a Merope 3 wheel imager instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param instrumentName Which particular instrument name to use (EM01,...).
+	 * @param filter0 A string representing the filter type string in wheel 0, i.e. SDSS-R.
+	 * @param filter1 A string representing the filter type string in wheel 1, i.e. air.
+	 * @param filter2 A string representing the filter type string in wheel 2, i.e. air.
+	 * @param bin How to bin the chip, usually use 2.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually false.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually false.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrMerope(String instrumentName,String filter0,String filter1,String filter2,int bin) 
+		throws TOCException
+	{
+		instr(instrumentName,filter0,filter1,filter2,bin,bin,false,false);
+	}
+
+	/**
+	 * Configure the RISE instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param bin How to bin the chip, usually use 1.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually true.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually true.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrRISE(int bin,boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr("RISE",null,null,null,bin,bin,calibrateBefore,calibrateAfter);
 	}
 
 	/**
@@ -485,6 +538,22 @@ public class TOCSession implements Logging
 				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
 	{
 		instr("FIXEDSPEC",null,null,null,xBin,yBin,calibrateBefore,calibrateAfter);
+	}
+
+	/**
+	 * Configure the NUVSPEC (Meaburn) instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param wavelengthString The central wavelength of the spectra to take usually one of: 
+	 *       "4690.2", "6182.6", "7291.6".
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrMeaburnSpec(String wavelengthString,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr("NUVSPEC",wavelengthString,null,null,1,1,calibrateBefore,calibrateAfter);
 	}
 
 	/**
@@ -719,6 +788,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.10  2007/04/25 10:34:06  cjm
+** Added instrRingoStar method for RINGO instrument support.
+**
 ** Revision 1.9  2007/01/30 18:35:34  cjm
 ** gnuify: Added GNU General Public License.
 **
