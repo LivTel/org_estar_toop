@@ -11,7 +11,8 @@ JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPAT
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TOCAClient.java TOCException.java TOCSession.java TOCSessionData.java TOCCommand.java \
-	AgRadial.java Auto.java Expose.java Helo.java Init.java Instr.java Position.java Offset.java Quit.java \
+	Acquire.java AgRadial.java Auto.java Expose.java Helo.java Init.java Instr.java \
+	Position.java Offset.java Quit.java \
 	Slew.java Status.java Stop.java When.java
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
