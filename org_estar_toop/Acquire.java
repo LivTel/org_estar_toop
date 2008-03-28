@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Slew.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Acquire.java,v 1.1 2008-03-27 19:43:42 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Acquire.java,v 1.2 2008-03-28 16:46:46 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Acquire command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 class Acquire extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Acquire.java,v 1.1 2008-03-27 19:43:42 cjm Exp $";
+	public final static String RCSID = "$Id: Acquire.java,v 1.2 2008-03-28 16:46:46 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -48,18 +48,6 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	 * The command name.
 	 */
 	public static final String COMMAND_NAME = "ACQUIRE";
-	/**
-	 * Acquire Mode: None.
-	 */
-	public static final String ACQUIRE_MODE_NONE = "NONE";
-	/**
-	 * Acquire Mode: Brightest.
-	 */
-	public static final String ACQUIRE_MODE_BRIGHTEST = "BRIGHTEST";
-	/**
-	 * Acquire Mode: WCS.
-	 */
-	public static final String ACQUIRE_MODE_WCS = "WCS";
 	/**
 	 * Input into the acquire command, the Right Ascension.
 	 */
@@ -70,11 +58,11 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	protected Dec dec = null;
 	/**
 	 * What sort of acquisition to perform.
-	 * @see #ACQUIRE_MODE_NONE
-	 * @see #ACQUIRE_MODE_BRIGHTEST
-	 * @see #ACQUIRE_MODE_WCS
+	 * @see TOCSession#ACQUIRE_MODE_NONE
+	 * @see TOCSession#ACQUIRE_MODE_BRIGHTEST
+	 * @see TOCSession#ACQUIRE_MODE_WCS
 	 */
-	protected String acquireMode = ACQUIRE_MODE_NONE;
+	protected String acquireMode = TOCSession.ACQUIRE_MODE_NONE;
 
 	/**
 	 * Default constructor.
@@ -88,9 +76,9 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	 * The acquire mode.
 	 * @param s The acquire mode.
 	 * @see #acquireMode
-	 * @see #ACQUIRE_MODE_NONE
-	 * @see #ACQUIRE_MODE_BRIGHTEST
-	 * @see #ACQUIRE_MODE_WCS
+	 * @see TOCSession#ACQUIRE_MODE_NONE
+	 * @see TOCSession#ACQUIRE_MODE_BRIGHTEST
+	 * @see TOCSession#ACQUIRE_MODE_WCS
 	 */
 	public void setAcquireMode(String s)
 	{
@@ -246,5 +234,8 @@ class Acquire extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.1  2008/03/27 19:43:42  cjm
+** Initial revision
+**
 **
 */
