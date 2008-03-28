@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.14 2008-03-28 16:47:11 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.15 2008-03-28 16:49:32 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.14 2008-03-28 16:47:11 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.15 2008-03-28 16:49:32 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -435,9 +435,9 @@ public class TOCSession implements Logging
 	 * @param acquireMode Which method to use to acquire.
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @see #acquire
-	 * @see Acquire#ACQUIRE_MODE_NONE
-	 * @see Acquire#ACQUIRE_MODE_BRIGHTEST
-	 * @see Acquire#ACQUIRE_MODE_WCS
+	 * @see #ACQUIRE_MODE_NONE
+	 * @see #ACQUIRE_MODE_BRIGHTEST
+	 * @see #ACQUIRE_MODE_WCS
 	 */
 	public void acquire(RA ra,Dec dec,String acquireMode) throws TOCException
 	{
@@ -460,9 +460,9 @@ public class TOCSession implements Logging
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @exception NumberFormatException Thrown if the RA/Dec parsing fails.
 	 * @see #acquire
-	 * @see Acquire#ACQUIRE_MODE_NONE
-	 * @see Acquire#ACQUIRE_MODE_BRIGHTEST
-	 * @see Acquire#ACQUIRE_MODE_WCS
+	 * @see #ACQUIRE_MODE_NONE
+	 * @see #ACQUIRE_MODE_BRIGHTEST
+	 * @see #ACQUIRE_MODE_WCS
 	 */
 	public void acquire(String raString,String decString,String acquireMode) throws TOCException, 
 											NumberFormatException
@@ -862,6 +862,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.14  2008/03/28 16:47:11  cjm
+** Moved ACQUIRE_MODE_ constants from Acquire, which is a package only class.
+**
 ** Revision 1.13  2008/03/28 15:51:23  cjm
 ** Fixed docs.
 **
