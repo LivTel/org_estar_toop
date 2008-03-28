@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.13 2008-03-28 15:51:23 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.14 2008-03-28 16:47:11 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,18 +46,33 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.13 2008-03-28 15:51:23 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.14 2008-03-28 16:47:11 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
 	public static final String CLASS = "TOCSession";
+	/**
+	 * Acquire Mode: None.
+	 * @see Acquire
+	 */
+	public static final String ACQUIRE_MODE_NONE = "NONE";
+	/**
+	 * Acquire Mode: Brightest.
+	 * @see Acquire
+	 */
+	public static final String ACQUIRE_MODE_BRIGHTEST = "BRIGHTEST";
+	/**
+	 * Acquire Mode: WCS.
+	 * @see Acquire
+	 */
+	public static final String ACQUIRE_MODE_WCS = "WCS";
 	/**
 	 * Class logger.
 	 */
@@ -847,6 +862,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.13  2008/03/28 15:51:23  cjm
+** Fixed docs.
+**
 ** Revision 1.12  2008/03/27 19:44:39  cjm
 ** Added Acquire command for spectrograph acquisition.
 **
