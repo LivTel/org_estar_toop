@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.12 2008-03-27 19:44:39 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.13 2008-03-28 15:51:23 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.12 2008-03-27 19:44:39 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.13 2008-03-28 15:51:23 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -421,8 +421,8 @@ public class TOCSession implements Logging
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @see #acquire
 	 * @see Acquire#ACQUIRE_MODE_NONE
-	 * @see Acquire##ACQUIRE_MODE_BRIGHTEST
-	 * @see Acquire##ACQUIRE_MODE_WCS
+	 * @see Acquire#ACQUIRE_MODE_BRIGHTEST
+	 * @see Acquire#ACQUIRE_MODE_WCS
 	 */
 	public void acquire(RA ra,Dec dec,String acquireMode) throws TOCException
 	{
@@ -446,8 +446,8 @@ public class TOCSession implements Logging
 	 * @exception NumberFormatException Thrown if the RA/Dec parsing fails.
 	 * @see #acquire
 	 * @see Acquire#ACQUIRE_MODE_NONE
-	 * @see Acquire##ACQUIRE_MODE_BRIGHTEST
-	 * @see Acquire##ACQUIRE_MODE_WCS
+	 * @see Acquire#ACQUIRE_MODE_BRIGHTEST
+	 * @see Acquire#ACQUIRE_MODE_WCS
 	 */
 	public void acquire(String raString,String decString,String acquireMode) throws TOCException, 
 											NumberFormatException
@@ -540,8 +540,6 @@ public class TOCSession implements Logging
 	 * @param filter1 A string representing the filter type string in wheel 1, i.e. air.
 	 * @param filter2 A string representing the filter type string in wheel 2, i.e. air.
 	 * @param bin How to bin the chip, usually use 2.
-	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually false.
-	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually false.
 	 * @exception TOCException Thrown if the instr command fails.
 	 * @see #instr
 	 */
@@ -849,6 +847,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.12  2008/03/27 19:44:39  cjm
+** Added Acquire command for spectrograph acquisition.
+**
 ** Revision 1.11  2008/03/27 12:50:59  cjm
 ** Rewrote instr command, now has 3 generic filters.
 ** Added instrImager to specify inst name.
