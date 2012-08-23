@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.15 2008-03-28 16:49:32 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.16 2012-08-23 14:00:09 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.15 2008-03-28 16:49:32 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.16 2012-08-23 14:00:09 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -482,7 +482,7 @@ public class TOCSession implements Logging
 	 * You should have called <b>helo</b> before this method. 
 	 * @param instID The ID of the instrument.
 	 * @param filter0 A string representing a filter type string, i.e. SDSS-R. Used for RATCAM lower filter,
-	 *                IR filter type, NUVSPEC wavelength (string), EM01 filter 0.
+	 *                IR filter type, IO:O filter type, NUVSPEC wavelength (string), EM01 filter 0.
 	 * @param filter1 A string representing a filter type string, i.e. clear. Used for RATCAM upper filter, 
 	 *                EM01 filter 1.
 	 * @param filter2 A string representing a filter type string, i.e. clear. Used for EM01 filter 2.
@@ -579,6 +579,22 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the IO:O instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param filterType A string representing the filter type string, i.e. 'R'.
+	 * @param bin How to bin the chip, usually use 1.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually true.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually true.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrIOO(String filterType,int bin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr("IO:O",filterType,null,null,bin,bin,calibrateBefore,calibrateAfter);
+	}
+
+	/**
 	 * Configure the IRCAM instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
 	 * @param filterType A string representing the filter type string, i.e. Barr-J.
@@ -591,8 +607,7 @@ public class TOCSession implements Logging
 	public void instrIRcam(String filterType,int bin,
 				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
 	{
-		instr("IRCAM",null,null,filterType,
-		      bin,bin,calibrateBefore,calibrateAfter);
+		instr("IRCAM",filterType,null,null,bin,bin,calibrateBefore,calibrateAfter);
 	}
 
 	/**
@@ -862,6 +877,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.15  2008/03/28 16:49:32  cjm
+** Fixed comments.
+**
 ** Revision 1.14  2008/03/28 16:47:11  cjm
 ** Moved ACQUIRE_MODE_ constants from Acquire, which is a package only class.
 **
