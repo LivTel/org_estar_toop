@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.5 2008-03-27 12:42:20 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.6 2012-08-23 14:01:16 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.5 2008-03-27 12:42:20 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.6 2012-08-23 14:01:16 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -64,6 +64,10 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * The index in the list of the IR filter.
 	 */
 	public final static int IR_FILTER_INDEX = 0;
+	/**
+	 * The index in the list of a single filter. Used for IO:O at the moment.
+	 */
+	public final static int SINGLE_FILTER_INDEX = 0;
 	/**
 	 * The index in the filter list of the NUVSPEC central wavelength.
 	 * Although not really a filter it is the NUVSPEC equivalent.
@@ -132,6 +136,17 @@ class Instr extends TOCCommand implements Logging, Runnable
 	public void setUpperFilter(String s)
 	{
 		setFilter(UPPER_FILTER_INDEX,s);
+	}
+
+	/**
+	 * Set the input filter to the INSTR command (for single filter instruments only).
+	 * @param s A filter type, e.g. 'R'.
+	 * @see #setFilter
+	 * @see #SINGLE_FILTER_INDEX
+	 */
+	public void setSingleFilter(String s)
+	{
+		setFilter(SINGLE_FILTER_INDEX,s);
 	}
 
 	/**
@@ -283,6 +298,19 @@ class Instr extends TOCCommand implements Logging, Runnable
 			}
 			commandString = new String(commandString+xBinning);
 		}
+		else if(instID.equals("IO:O"))
+		{
+			if(xBinning != yBinning)
+			{
+				successful = false;
+				errorString = new String(this.getClass().getName()+
+							 ":run:X binning "+xBinning+" does not match Y binning "+
+							 yBinning+".");
+				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
+				return;
+			}
+			commandString = new String(commandString+filterList[SINGLE_FILTER_INDEX]+" "+xBinning);
+		}
 		else if(instID.equals("IRCAM"))
 		{
 			if(xBinning != yBinning)
@@ -358,6 +386,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String xBinningString = null;
 		String yBinningString = null;
 		String irFilterString = null;
+		String singleFilterString = null;
 		String calibrateBeforeString = null;
 		String calibrateAfterString = null;
 		Boolean b = null;
@@ -400,6 +429,19 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[4];
 			calibrateAfterString = args[5];
 		}
+		else if(instID.equals("IO:O"))
+		{
+			if(args.length != 6)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			singleFilterString = args[2];
+			xBinningString = args[3];
+			yBinningString = args[3];
+			calibrateBeforeString = args[4];
+			calibrateAfterString = args[5];
+		}
 		else if(instID.equals("FIXEDSPEC"))
 		{
 			if(args.length != 6)
@@ -414,7 +456,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else
 		{
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM or FIXEDSPEC.");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O or FIXEDSPEC.");
 			System.exit(1);
 		}
 		// convert binning strings to numbers
@@ -456,9 +498,14 @@ class Instr extends TOCCommand implements Logging, Runnable
 		instr = new Instr();
 		instr.setSessionData(sessionData);
 		instr.setInstId(instID);
-		instr.setLowerFilter(lowerFilterString);
-		instr.setUpperFilter(upperFilterString);
-		instr.setIRFilter(irFilterString);
+		if(lowerFilterString != null)
+			instr.setLowerFilter(lowerFilterString);
+		if(upperFilterString != null)
+			instr.setUpperFilter(upperFilterString);
+		if(irFilterString != null)
+			instr.setIRFilter(irFilterString);
+		if(singleFilterString != null)
+			instr.setSingleFilter(singleFilterString);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
 		instr.setCalibrateBefore(calibrateBefore);
@@ -478,6 +525,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.5  2008/03/27 12:42:20  cjm
+** Added RISE Instr and more aliases for RATCAM/HAWKCAM.
+**
 ** Revision 1.4  2008/03/26 15:00:30  cjm
 ** Changed filter handling to be list based.
 ** Added Merope (EM01), EA01, and NUVSPEC implementations.
