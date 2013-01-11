@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.7 2013-01-11 17:57:10 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.8 2013-01-11 18:34:22 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.7 2013-01-11 17:57:10 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.8 2013-01-11 18:34:22 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -232,7 +232,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 
 	/**
 	 * Set the input EM Gain to the INSTR command. Used by RINGO3/THOR.
-	 * @param emGain The emGain. Usually 1, 10 or 100.
+	 * @param g The emGain. Usually 1, 10 or 100.
 	 * @see #emGain
 	 */
 	public void setEMGain(int g)
@@ -583,6 +583,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.7  2013/01/11 17:57:10  cjm
+** Added Ringo3 support.
+**
 ** Revision 1.6  2012/08/23 14:01:16  cjm
 ** Added IO:O support.
 **
