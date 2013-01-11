@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.6 2012-08-23 14:01:16 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.7 2013-01-11 17:57:10 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.6 2012-08-23 14:01:16 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.7 2013-01-11 17:57:10 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -74,7 +74,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	public final static int NUVIEW_WAVELENGTH_FILTER_INDEX = 0;
 	/**
-	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE.
+	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE, IO:O, RINGO3.
 	 */
 	protected String instID = null;
 	/**
@@ -89,6 +89,14 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * Input into the instr command, the y binning.
 	 */
 	protected int yBinning = 2;
+	/**
+	 * Input into the instr command, the trigger type. One of 'internal / 'external'. RINGO3 only.
+	 */
+	protected String triggerType = null;
+	/**
+	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/THOR only.
+	 */
+	protected int emGain = 0;
 	/**
 	 * Input into the instr command, whether to do calibration before any exposures using this configuration.
 	 */
@@ -213,6 +221,26 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set the input trigger type to the INSTR command. Used by RINGO3.
+	 * @param s The trigger type, one of 'internal' / 'external'.
+	 * @see #triggerType
+	 */
+	public void setTriggerType(String s)
+	{
+		triggerType = s;
+	}
+
+	/**
+	 * Set the input EM Gain to the INSTR command. Used by RINGO3/THOR.
+	 * @param emGain The emGain. Usually 1, 10 or 100.
+	 * @see #emGain
+	 */
+	public void setEMGain(int g)
+	{
+		emGain = g;
+	}
+
+	/**
 	 * Set the input to the INSTR command, 
 	 * which determines whether the instrument will do a calibration frame before using this configuration.
 	 * @param b A boolean
@@ -245,6 +273,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #instID
 	 * @see #xBinning
 	 * @see #yBinning
+	 * @see #triggerType
+	 * @see #emGain
 	 * @see #calibrateBefore
 	 * @see #calibrateAfter
 	 * @see #filterList
@@ -336,6 +366,12 @@ class Instr extends TOCCommand implements Logging, Runnable
 		{
 			commandString = new String(commandString+xBinning+" "+yBinning);
 		}
+		else if(instID.equals("RINGO3"))
+		{
+			// INSTR <session id> RINGO3 <internal|external> <emgain> <xbin> <ybin>
+			commandString = new String(commandString+triggerType+" "+emGain+" "+xBinning+" "+yBinning);
+		}
+		// diddly FRODOSPEC TODO
 		else
 		{
 			successful = false;
@@ -387,17 +423,19 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String yBinningString = null;
 		String irFilterString = null;
 		String singleFilterString = null;
+		String triggerTypeString = null;
+		String emGainString = null;
 		String calibrateBeforeString = null;
 		String calibrateAfterString = null;
 		Boolean b = null;
-		int xBinning,yBinning;
+		int xBinning,yBinning,emGain;
 		boolean calibrateBefore,calibrateAfter;
 
 		if(args.length < 2)
 		{
-			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<ir filter> <bin>]|[<xbin> <ybin>] <calibrate before> <calibrate after>");
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM or FIXEDSPEC.");
-			System.out.println("The first set of optional parameters are for RATCAM, the second for IRCAM and the third for FIXEDSPEC.");
+			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>] <calibrate before> <calibrate after>");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3.");
+			System.out.println("The first set of optional parameters are for RATCAM, the second for IRCAM/IO:O and the third for FIXEDSPEC, the fourth for RINGO3.");
 			System.exit(1);
 		}
 		inputPropertiesFile = new File(args[0]);
@@ -454,11 +492,28 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[4];
 			calibrateAfterString = args[5];
 		}
+		else if(instID.equals("RINGO3"))
+		{
+			if(args.length != 7)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			triggerTypeString = args[2];
+			emGainString = args[3];
+			xBinningString = args[4];
+			yBinningString = args[4];
+			calibrateBeforeString = args[5];
+			calibrateAfterString = args[6];
+		}
+		// diddly FrodoSpec
 		else
 		{
 			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O or FIXEDSPEC.");
 			System.exit(1);
 		}
+		// convert emGain strings into number
+		emGain = Integer.parseInt(emGainString);
 		// convert binning strings to numbers
 		xBinning = Integer.parseInt(xBinningString);
 		yBinning = Integer.parseInt(yBinningString);
@@ -506,6 +561,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 			instr.setIRFilter(irFilterString);
 		if(singleFilterString != null)
 			instr.setSingleFilter(singleFilterString);
+		if(triggerTypeString != null)
+			instr.setTriggerType(triggerTypeString);
+		instr.setEMGain(emGain);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
 		instr.setCalibrateBefore(calibrateBefore);
@@ -525,6 +583,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.6  2012/08/23 14:01:16  cjm
+** Added IO:O support.
+**
 ** Revision 1.5  2008/03/27 12:42:20  cjm
 ** Added RISE Instr and more aliases for RATCAM/HAWKCAM.
 **

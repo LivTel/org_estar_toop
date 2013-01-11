@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.16 2012-08-23 14:00:09 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.17 2013-01-11 17:57:01 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.16 2012-08-23 14:00:09 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.17 2013-01-11 17:57:01 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -659,6 +659,40 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the RINGO3 instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param triggerType A string describing what trigger type to use, one of : 'internal','external'.
+	 * @param emGain The EMGain to use, an integer, usually 1,10, or 100.
+	 * @param xBin How to bin the chip in X.
+	 * @param yBin How to bin the chip in Y.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrRingo3(String triggerType,int emGain,int xBin,int yBin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("RINGO3");
+		instr.setFilter(0,null);
+		instr.setFilter(1,null);
+		instr.setFilter(2,null);
+		instr.setTriggerType(triggerType);
+		instr.setEMGain(emGain);
+		instr.setXBinning(xBin);
+		instr.setYBinning(yBin);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+
+	// diddly instrFrodospec FRODOSPEC TODO
+
+	/**
 	 * Take a MULTRUN exposure.
 	 * You should have called <b>helo</b>, <b>slew</b> and <b>instr</b> before this method. 
 	 * @param exposureLength The length of each exposure in milliseconds
@@ -877,6 +911,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.16  2012/08/23 14:00:09  cjm
+** Added instrIOO.
+**
 ** Revision 1.15  2008/03/28 16:49:32  cjm
 ** Fixed comments.
 **
