@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.17 2013-01-11 17:57:01 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.18 2013-01-17 14:17:02 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -46,14 +46,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.17 2013-01-11 17:57:01 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.18 2013-01-17 14:17:02 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -690,6 +690,40 @@ public class TOCSession implements Logging
 		}
 	}
 
+	/**
+	 * Configure the IO:THOR instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param emGain The EMGain to use, an integer, usually 1,10, or 100.
+	 * @param bin How to bin the chip in X and Y.
+	 * @param xStart The start position of the window in X, in pixels.
+	 * @param yStart The start position of the window in Y, in pixels.
+	 * @param xEnd The end position of the window in X, in pixels.
+	 * @param yEnd The end position of the window in Y, in pixels.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrIOTHOR(int emGain,int bin,int xStart,int yStart,int xEnd,int yEnd,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("IO:THOR");
+		instr.setFilter(0,null);
+		instr.setFilter(1,null);
+		instr.setFilter(2,null);
+		instr.setEMGain(emGain);
+		instr.setXBinning(bin);
+		instr.setYBinning(bin);
+		instr.setWindow(xStart,yStart,xEnd,yEnd);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+
 	// diddly instrFrodospec FRODOSPEC TODO
 
 	/**
@@ -911,6 +945,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.17  2013/01/11 17:57:01  cjm
+** Added Ringo3 support.
+**
 ** Revision 1.16  2012/08/23 14:00:09  cjm
 ** Added instrIOO.
 **
