@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.8 2013-01-11 18:34:22 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.9 2013-01-17 14:17:17 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.8 2013-01-11 18:34:22 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.9 2013-01-17 14:17:17 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -94,9 +94,14 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	protected String triggerType = null;
 	/**
-	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/THOR only.
+	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/IO:THOR only.
 	 */
 	protected int emGain = 0;
+	/**
+	 * Input into the instr command, a window. Used for THOR only.
+	 * @see #window
+	 */
+	protected InstrWindow window = new InstrWindow();
 	/**
 	 * Input into the instr command, whether to do calibration before any exposures using this configuration.
 	 */
@@ -107,11 +112,13 @@ class Instr extends TOCCommand implements Logging, Runnable
 	protected boolean calibrateAfter = false;
 
 	/**
-	 * Default constructor.
+	 * Default constructor. A new window is constructed.
+	 * @see #window
 	 */
 	public Instr() 
 	{
 		super();
+		window = new InstrWindow();
 	}
 
 	/**
@@ -241,6 +248,22 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set the input window o the INSTR command. Used by THOR.
+	 * @param xStart The X Start position of the window, in pixels.
+	 * @param yStart The Y Start position of the window, in pixels.
+	 * @param xEnd The X End position of the window, in pixels.
+	 * @param yEnd The Y End position of the window, in pixels.
+	 * @see #window
+	 */
+	public void setWindow(int xStart,int yStart,int xEnd,int yEnd)
+	{
+		window.setXStart(xStart);
+		window.setYStart(yStart);
+		window.setXEnd(xEnd);
+		window.setYEnd(yEnd);
+	}
+
+	/**
 	 * Set the input to the INSTR command, 
 	 * which determines whether the instrument will do a calibration frame before using this configuration.
 	 * @param b A boolean
@@ -275,6 +298,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #yBinning
 	 * @see #triggerType
 	 * @see #emGain
+	 * @see #window
 	 * @see #calibrateBefore
 	 * @see #calibrateAfter
 	 * @see #filterList
@@ -371,6 +395,13 @@ class Instr extends TOCCommand implements Logging, Runnable
 			// INSTR <session id> RINGO3 <internal|external> <emgain> <xbin> <ybin>
 			commandString = new String(commandString+triggerType+" "+emGain+" "+xBinning+" "+yBinning);
 		}
+		else if(instID.equals("IO:THOR"))
+		{
+			// INSTR <sessionId> IO:THOR <emgain> <binxy> <xs> <xe> <ys> <ye> 
+			commandString = new String(commandString+emGain+" "+xBinning+" "+window.getXStart()+" "+
+						   window.getXEnd()+" "+window.getYStart()+" "+window.getYEnd());
+
+		}
 		// diddly FRODOSPEC TODO
 		else
 		{
@@ -425,16 +456,17 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String singleFilterString = null;
 		String triggerTypeString = null;
 		String emGainString = null;
+		InstrWindow win = null;
 		String calibrateBeforeString = null;
 		String calibrateAfterString = null;
 		Boolean b = null;
-		int xBinning,yBinning,emGain;
+		int xBinning,yBinning,emGain=0;
 		boolean calibrateBefore,calibrateAfter;
 
 		if(args.length < 2)
 		{
-			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>] <calibrate before> <calibrate after>");
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3.");
+			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>] <calibrate before> <calibrate after>");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR.");
 			System.out.println("The first set of optional parameters are for RATCAM, the second for IRCAM/IO:O and the third for FIXEDSPEC, the fourth for RINGO3.");
 			System.exit(1);
 		}
@@ -506,6 +538,25 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[5];
 			calibrateAfterString = args[6];
 		}
+		else if(instID.equals("IO:THOR"))
+		{
+			// <emgain> <bin> <xs> <ys> <xe> <ye>
+			if(args.length != 10)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			win = new InstrWindow();
+			emGainString = args[2];
+			xBinningString = args[3];
+			yBinningString = args[3];
+			win.setXStart(args[4]);
+			win.setYStart(args[5]);
+			win.setXEnd(args[6]);
+			win.setYEnd(args[7]);
+			calibrateBeforeString = args[8];
+			calibrateAfterString = args[9];
+		}
 		// diddly FrodoSpec
 		else
 		{
@@ -513,7 +564,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 			System.exit(1);
 		}
 		// convert emGain strings into number
-		emGain = Integer.parseInt(emGainString);
+		if(emGainString != null)
+			emGain = Integer.parseInt(emGainString);
 		// convert binning strings to numbers
 		xBinning = Integer.parseInt(xBinningString);
 		yBinning = Integer.parseInt(yBinningString);
@@ -566,6 +618,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 		instr.setEMGain(emGain);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
+		if(win != null)
+			instr.setWindow(win.getXStart(),win.getYStart(),win.getXEnd(),win.getYEnd());
 		instr.setCalibrateBefore(calibrateBefore);
 		instr.setCalibrateAfter(calibrateAfter);
 		instr.run();
@@ -580,9 +634,236 @@ class Instr extends TOCCommand implements Logging, Runnable
 		System.out.println("Instr finished.");
 		System.exit(0);
 	}
+
+	/**
+	 * Inner class defining a Window object, to store a sub-area
+	 * of the CCD for windowing configuration. This is currently used only by
+	 * IO:THOR.
+	 */
+	public static class InstrWindow
+	{
+		/** 
+		 * The X axis position of the top/left corner of the window.
+		 */
+		protected int xStart;
+		/** 
+		 * The X axis position of the bottom/right corner of the window.
+		 */
+		protected int xEnd;
+		/** 
+		 * The Y axis position of the top/left corner of the window.
+		 */
+ 		protected int yStart;
+		/**
+		 *The Y axis position of the bottom/right corner of the window.
+		 */
+		protected int yEnd;
+
+		/**
+		 * Default constructor.
+		 */
+		public InstrWindow()
+		{
+			this(0,0,0,0);
+		}
+
+		/**
+		 * Constructor.
+		 * @param xs The X Start position of the window, in pixels.
+		 * @param ys The Y Start position of the window, in pixels.
+		 * @param xe The X End position of the window, in pixels.
+		 * @param ye The Y End position of the window, in pixels.
+		 */
+		public InstrWindow(int xs,int ys,int xe, int ye)
+		{
+			this.xStart = xs;
+			this.yStart = ys;
+			this.xEnd = xe;
+			this.yEnd = ye;
+		}
+
+		/**
+		 * Retrieve the X Start position of this window.
+		 * @return An integer, the X Start position of this window in pixels.
+		 * @see #xStart
+		 */
+		public int getXStart()
+		{
+			return xStart;
+		}
+
+		/**
+		 * Retrieve the Y Start position of this window.
+		 * @return An integer, the Y Start position of this window in pixels.
+		 * @see #yStart
+		 */
+		public int getYStart()
+		{
+			return yStart;
+		}
+
+		/**
+		 * Retrieve the X End position of this window.
+		 * @return An integer, the X End position of this window in pixels.
+		 * @see #xEnd
+		 */
+		public int getXEnd()
+		{
+			return xEnd;
+		}
+
+		/**
+		 * Retrieve the Y End position of this window.
+		 * @return An integer, the Y End position of this window in pixels.
+		 * @see #yEnd
+		 */
+		public int getYEnd()
+		{
+			return yEnd;
+		}
+
+		/**
+		 * Set the X Start position of this window.
+		 * @param xs An integer, the X Start position of this window in pixels.
+		 * @see #xStart
+		 */
+		public void setXStart(int xs)
+		{
+			xStart = xs;
+		}
+
+		/**
+		 * Set the X Start position of this window.
+		 * @param s A string, resresenting an integer,the X Start position of this window in pixels.
+		 * @see #xStart
+		 */
+		public void setXStart(String s) throws NumberFormatException
+		{
+			xStart = Integer.parseInt(s);
+		}
+
+		/**
+		 * Set the Y Start position of this window.
+		 * @param ys An integer, the Y Start position of this window in pixels.
+		 * @see #yStart
+		 */
+		public void setYStart(int ys)
+		{
+			yStart = ys;
+		}
+
+		/**
+		 * Set the Y Start position of this window.
+		 * @param s A string, resresenting an integer,the Y Start position of this window in pixels.
+		 * @see #yStart
+		 */
+		public void setYStart(String s) throws NumberFormatException
+		{
+			yStart = Integer.parseInt(s);
+		}
+
+		/**
+		 * Set the X End position of this window.
+		 * @param xe An integer, the X End position of this window in pixels.
+		 * @see #xEnd
+		 */
+		public void setXEnd(int xe)
+		{
+			xEnd = xe;
+		}
+
+		/**
+		 * Set the X End position of this window.
+		 * @param s A string, resresenting an integer,the X End position of this window in pixels.
+		 * @see #xEnd
+		 */
+		public void setXEnd(String s) throws NumberFormatException
+		{
+			xEnd = Integer.parseInt(s);
+		}
+
+		/**
+		 * Set the Y End position of this window.
+		 * @param ye An integer, the Y End position of this window in pixels.
+		 * @see #yEnd
+		 */
+		public void setYEnd(int ye)
+		{
+			yEnd = ye;
+		}
+
+		/**
+		 * Set the Y End position of this window.
+		 * @param s A string, resresenting an integer,the Y End position of this window in pixels.
+		 * @see #yEnd
+		 */
+		public void setYEnd(String s) throws NumberFormatException
+		{
+			yEnd = Integer.parseInt(s);
+		}
+
+		/**
+		 * Get the width of the window, in pixels. This assumes the width is exclusive not inclusive.
+		 * @return An integer, the width of the window.
+		 * @see #xEnd
+		 * @see #xStart
+		 */
+		public int getWidth()
+		{
+			return xEnd - xStart;
+		}
+
+		/**
+		 * Get the height of the window, in pixels. This assumes the height is exclusive not inclusive.
+		 * @return An integer, the height of the window.
+		 * @see #yEnd
+		 * @see #yStart
+		 */
+		public int getHeight()
+		{
+			return yEnd - yStart;
+		}
+
+		/**
+		 * Return a string representation of this window, of the form:
+		 * InstrWindow(xStart = n,yStart = n,xEnd = n,yEnd = n).
+		 * @return A string.
+		 * @see #toString(java.lang.String)
+		 */
+		public String toString()
+		{
+			return toString("");
+		}
+
+		/**
+		 * Return a string representation of this window, of the form:
+		 * InstrWindow(xStart = n,yStart = n,xEnd = n,yEnd = n).
+		 * @param prefix A string to prepend to the string.
+		 * @return A string.
+		 * @see #xStart
+		 * @see #yStart
+		 * @see #xEnd
+		 * @see #yEnd
+		 */
+		public String toString(String prefix)
+		{
+			StringBuffer sb = null;
+
+			sb = new StringBuffer();
+			sb.append(prefix+"InstrWindow(");
+			sb.append("xStart = "+xStart+",");
+			sb.append("yStart = "+yStart+",");
+			sb.append("xEnd = "+xEnd+",");
+			sb.append("yEnd = "+yEnd+")");
+			return sb.toString();
+		}
+	}
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.8  2013/01/11 18:34:22  cjm
+** Comment fix.
+**
 ** Revision 1.7  2013/01/11 17:57:10  cjm
 ** Added Ringo3 support.
 **
