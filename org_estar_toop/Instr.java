@@ -18,12 +18,13 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // Instr.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.9 2013-01-17 14:17:17 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/Instr.java,v 1.10 2013-06-03 10:32:35 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
 import java.util.*;
 
+import ngat.phase2.OConfig;
 import ngat.util.*;
 import ngat.util.logging.*;
 
@@ -32,14 +33,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.9 2013-01-17 14:17:17 cjm Exp $";
+	public final static String RCSID = "$Id: Instr.java,v 1.10 2013-06-03 10:32:35 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -49,9 +50,10 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	public final static String COMMAND_NAME = "INSTR";
 	/**
-	 * The maximum number of filters that can be specified.
+	 * The maximum number of filters that can be specified. This is now 4, as IO:O requires 3
+	 * filters, but there are indexed starting at position 1.
 	 */
-	public final static int FILTER_LIST_COUNT = 3;
+	public final static int FILTER_LIST_COUNT = 4;
 	/**
 	 * The index in the list of the lower filter.
 	 */
@@ -363,7 +365,10 @@ class Instr extends TOCCommand implements Logging, Runnable
 				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
 				return;
 			}
-			commandString = new String(commandString+filterList[SINGLE_FILTER_INDEX]+" "+xBinning);
+			commandString = new String(commandString+filterList[OConfig.O_FILTER_INDEX_FILTER_WHEEL]+" "+
+						   filterList[OConfig.O_FILTER_INDEX_FILTER_SLIDE_LOWER]+" "+
+						   filterList[OConfig.O_FILTER_INDEX_FILTER_SLIDE_UPPER]+" "+
+						   xBinning);
 		}
 		else if(instID.equals("IRCAM"))
 		{
@@ -861,6 +866,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.9  2013/01/17 14:17:17  cjm
+** Added IO:THOR support.
+**
 ** Revision 1.8  2013/01/11 18:34:22  cjm
 ** Comment fix.
 **
