@@ -18,12 +18,13 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // TOCSession.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.18 2013-01-17 14:17:02 cjm Exp $
+// $Header: /space/home/eng/cjm/cvs/org_estar_toop/TOCSession.java,v 1.19 2013-06-03 10:31:07 cjm Exp $
 package org.estar.toop;
 
 import java.io.*;
 import java.util.*;
 
+import ngat.phase2.OConfig;
 import ngat.util.*;
 import ngat.util.logging.*;
 
@@ -46,14 +47,14 @@ import org.estar.astrometry.*;
  * ts.quit();
  * </pre>
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class TOCSession implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSession.java,v 1.18 2013-01-17 14:17:02 cjm Exp $";
+	public final static String RCSID = "$Id: TOCSession.java,v 1.19 2013-06-03 10:31:07 cjm Exp $";
 	/**
 	 * Classname for logging.
 	 */
@@ -581,17 +582,40 @@ public class TOCSession implements Logging
 	/**
 	 * Configure the IO:O instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
-	 * @param filterType A string representing the filter type string, i.e. 'R'.
+	 * @param filterTypeList An array of strings representing the filter type strings, i.e. 'R'.
+	 *        There should be three for IO:O but starting from index 1 i.e. 1 = filter wheel, 
+	 *        2 = lower filter slide, 3 = upper filter slide. There fore the array should have a length of
+	 *        at least 4.
 	 * @param bin How to bin the chip, usually use 1.
 	 * @param calibrateBefore Whether to do calibration frames before using this configuration, usually true.
 	 * @param calibrateAfter Whether to do calibration frames after using this configuration, usually true.
 	 * @exception TOCException Thrown if the instr command fails.
 	 * @see #instr
 	 */
-	public void instrIOO(String filterType,int bin,
-				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	public void instrIOO(String filterTypeList[],int bin,
+			     boolean calibrateBefore,boolean calibrateAfter) throws TOCException
 	{
-		instr("IO:O",filterType,null,null,bin,bin,calibrateBefore,calibrateAfter);
+		if(filterTypeList.length < OConfig.O_FILTER_INDEX_COUNT)
+		{
+			throw new TOCException(this.getClass().getName()+
+					       ":instr failed:filterTypeList length was too short:"+
+					       filterTypeList.length+" vs "+OConfig.O_FILTER_INDEX_COUNT);
+		}
+		instr.setInstId("IO:O");
+		for(int i = OConfig.O_FILTER_INDEX_FILTER_WHEEL;
+		    i <= OConfig.O_FILTER_INDEX_FILTER_SLIDE_UPPER; i++)
+		{
+			instr.setFilter(i,filterTypeList[i]);
+		}
+		instr.setXBinning(bin);
+		instr.setYBinning(bin);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
 	}
 
 	/**
@@ -945,6 +969,9 @@ public class TOCSession implements Logging
 }
 /*
 ** $Log: not supported by cvs2svn $
+** Revision 1.18  2013/01/17 14:17:02  cjm
+** Added instrIOTHOR.
+**
 ** Revision 1.17  2013/01/11 17:57:01  cjm
 ** Added Ringo3 support.
 **
