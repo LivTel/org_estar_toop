@@ -1,0 +1,30 @@
+ftnproxy
+--------
+scp /home/dev/bin/estar/javalib/org_estar_toop.jar /home/dev/bin/estar/javalib/org_estar_toop_test.jar eng@ftnproxy:/occ/tea/javalib/
+scp ftnproxy_toop.properties eng@ftnproxy:
+scp ltproxy_toop.properties eng@ftnproxy:
+scp test_session.csh eng@ftnproxy:scripts
+
+setenv CLASSPATH "${CLASSPATH}:/occ/tea/javalib/org_estar_toop.jar:/occ/tea/javalib/org_estar_toop_test.jar:/occ/common/ngat/ngat_net.jar"
+
+ltproxy
+--------
+scp /home/dev/bin/estar/javalib/org_estar_toop.jar /home/dev/bin/estar/javalib/org_estar_toop_test.jar eng@ltproxy:proxy/tea/javalib/
+scp ftnproxy_toop.properties ltproxy_toop.properties eng@ltproxy:
+scp test_session.csh eng@ltproxy:scripts
+
+setenv CLASSPATH "${CLASSPATH}:/home/eng/proxy/tea/javalib/org_estar_toop.jar:/home/eng/proxy/tea/javalib/org_estar_toop_test.jar:/home/eng/proxy/common/ngat/ngat_net.jar"
+
+java org.estar.toop.When ftnproxy_toop.properties
+java org.estar.toop.Helo ftnproxy_toop.properties ftnproxy_toop_helo.properties
+java org.estar.toop.Quit ftnproxy_toop_helo.properties
+java org.estar.toop.Position ftnproxy_toop_helo.properties 01:02:03 +45:56:12
+java org.estar.toop.Instr ftnproxy_toop_helo.properties RATCAM SDSS-R clear 2 F F
+java org.estar.toop.Instr ftnproxy_toop_helo.properties IRCAM Barr-J 1 T T
+java org.estar.toop.Instr ftnproxy_toop_helo.properties FIXEDSPEC 1 1 T T
+java org.estar.toop.Slew ftnproxy_toop_helo.properties source 01:02:03 +45:56:01
+java org.estar.toop.Expose ftnproxy_toop_helo.properties 10000 1 true
+java org.estar.toop.Expose ftnproxy_toop_helo.properties 10000 2005-06-06T15:45:00 true
+java org.estar.toop.test.TestSession -session_data ftnproxy_toop.properties -source "test" -ra 01:02:03 -dec +45:56:01 -exposure_length 10000 -exposure_count 1 -lower_filter SDSS-R -upper_filter clear -bin 2
+java org.estar.toop.Status ftnproxy_toop.properties METEO humidity
+

@@ -1,0 +1,28 @@
+#!/bin/csh
+# $Header: /space/home/eng/cjm/cvs/org_estar_toop/test/test_session.csh.ltproxy,v 1.1 2019-01-07 14:21:10 cjm Exp $
+# Run as follows:
+# echo "/home/eng/scripts/test_session.csh" | at 21:17
+# ltproxy
+foreach jar ( /home/eng/proxy/tea/javalib/*.jar /home/eng/proxy/common/ngat/*.jar )
+    echo "${CLASSPATH}" | /bin/grep -q $jar
+    if ( $status != 0 ) then
+	setenv CLASSPATH ${jar}":"${CLASSPATH}
+    endif
+end
+set session_data = /home/eng/ltproxy_toop.properties
+# m53 - good for lt at 10pm June
+set source_name = "m53"
+set ra = "13:12:55"
+set dec = "+18:10:09"
+set exposure_length = 10000
+set exposure_count = 1
+set lower_filter = "SDSS-R"
+set upper_filter = "clear"
+set bin = 2
+set date_string = `date +"%Y-%m-%dT%H:%M:%S"`
+set output_filename = "/home/eng/tmp/test_session_output-${date_string}.txt"
+echo "java org.estar.toop.test.TestSession -session_data ${session_data} -source ${source_name} -ra ${ra} -dec ${dec} -exposure_length ${exposure_length} -exposure_count ${exposure_count} -lower_filter ${lower_filter} -upper_filter ${upper_filter} -bin ${bin} > ${output_filename} )  >& ${output_filename}" >> ${output_filename}
+(java org.estar.toop.test.TestSession -session_data ${session_data} -source ${source_name} -ra ${ra} -dec ${dec} -exposure_length ${exposure_length} -exposure_count ${exposure_count} -lower_filter ${lower_filter} -upper_filter ${upper_filter} -bin ${bin} >> ${output_filename} )  >>& ${output_filename}
+#
+# $Log: not supported by cvs2svn $
+#
