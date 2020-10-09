@@ -8,7 +8,7 @@ TOOP_NAME	=toop
 PACKAGEDIR 	=org/$(ESTAR_NAME)/$(TOOP_NAME)/$(TEST_NAME)
 PACKAGENAME	=org.$(ESTAR_NAME).$(TOOP_NAME).$(TEST_NAME)
 JAR_FILE	=org_$(ESTAR_NAME)_$(TOOP_NAME)_$(TEST_NAME).jar
-JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASSPATH)
+JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TestSession.java 

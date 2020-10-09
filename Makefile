@@ -7,7 +7,7 @@ TOOP_NAME	=toop
 PACKAGEDIR 	=org/$(ESTAR_NAME)/$(TOOP_NAME)
 PACKAGENAME	=org.$(ESTAR_NAME).$(TOOP_NAME)
 JAR_FILE	=org_$(ESTAR_NAME)_$(TOOP_NAME).jar
-JAVACFLAGS 	= -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
+JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TOCAClient.java TOCException.java TOCSession.java TOCSessionData.java TOCCommand.java \

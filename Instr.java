@@ -33,14 +33,14 @@ import org.estar.astrometry.*;
 /** 
  * Instr command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.10 $
+ * @version $Revision$
  */
 class Instr extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Instr.java,v 1.10 2013-06-03 10:32:35 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

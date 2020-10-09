@@ -30,14 +30,14 @@ import ngat.util.logging.*;
 /** 
  * Looks after data associated with a target of oppurtunity control session
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class TOCSessionData implements Logging
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCSessionData.java,v 1.4 2007-01-30 18:35:33 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

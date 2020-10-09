@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Offset command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 class Offset extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Offset.java,v 1.2 2007-01-30 18:35:25 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

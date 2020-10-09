@@ -31,14 +31,14 @@ import ngat.util.logging.*;
 /** 
  * Expose command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 public class Expose extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Expose.java,v 1.5 2007-01-30 18:35:22 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

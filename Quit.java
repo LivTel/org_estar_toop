@@ -30,14 +30,14 @@ import ngat.util.logging.*;
 /** 
  * Quit command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 class Quit extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Quit.java,v 1.2 2007-01-30 18:35:27 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

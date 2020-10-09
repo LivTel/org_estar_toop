@@ -45,14 +45,14 @@ import org.estar.toop.*;
  *         -lower_filter SDSS-R -upper_filter clear -bin 2
  * </pre>
  * @author Chris Mottram
- * @version $Revision: 1.6 $
+ * @version $Revision$
  */
 public class TestSession
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TestSession.java,v 1.6 2007-01-30 18:35:47 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * The session reference.
 	 */

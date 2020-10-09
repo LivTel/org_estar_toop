@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Position command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class Position extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Position.java,v 1.4 2007-01-30 18:35:26 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

@@ -31,14 +31,14 @@ import ngat.util.logging.*;
 /** 
  * Handles responses to commands sent via "Target of Opportunity Control Protocol" (TOCP).
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.5 $
+ * @version $Revision$
  */
 class TOCAClient implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: TOCAClient.java,v 1.5 2007-01-30 18:35:30 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */

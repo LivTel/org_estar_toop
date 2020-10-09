@@ -26,14 +26,14 @@ import java.io.*;
 /**
  * This class extends Exception. 
  * @author Chris Mottram
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class TOCException extends Exception
 {
 	/**
 	 * Revision Control System id string, showing the version of the Class
 	 */
-	public final static String RCSID = new String("$Id: TOCException.java,v 1.4 2007-01-30 18:35:32 cjm Exp $");
+	public final static String RCSID = new String("$Id$");
 	/**
 	 * An exception that caused this exception to be generated.
 	 */
