@@ -715,6 +715,35 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the MOPTOP instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param filterType A string representing the filter type string, i.e. MOP-R.
+	 * @param rotorSpeed A string describing the rotor speed to use, one of : 'slow','fast'.
+	 * @param xBin How to bin the chip in X.
+	 * @param yBin How to bin the chip in Y.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrMoptop(String filterType,String rotorSpeed,int xBin,int yBin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("MOPTOP");
+		instr.setSingleFilter(filterType);
+		instr.setRotorSpeed(rotorSpeed);
+		instr.setXBinning(xBin);
+		instr.setYBinning(yBin);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+
+	/**
 	 * Configure the IO:THOR instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
 	 * @param emGain The EMGain to use, an integer, usually 1,10, or 100.
