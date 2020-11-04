@@ -67,7 +67,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	public final static int IR_FILTER_INDEX = 0;
 	/**
-	 * The index in the list of a single filter. Used for IO:O at the moment.
+	 * The index in the list of a single filter. Used for IO:O and MOPTOP.
 	 */
 	public final static int SINGLE_FILTER_INDEX = 0;
 	/**
@@ -76,7 +76,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	public final static int NUVIEW_WAVELENGTH_FILTER_INDEX = 0;
 	/**
-	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE, IO:O, RINGO3.
+	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE, IO:O, RINGO3, IO:THOR, MOPTOP.
 	 */
 	protected String instID = null;
 	/**
@@ -92,9 +92,13 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	protected int yBinning = 2;
 	/**
-	 * Input into the instr command, the trigger type. One of 'internal / 'external'. RINGO3 only.
+	 * Input into the instr command, the trigger type. One of 'internal' / 'external'. RINGO3 only.
 	 */
 	protected String triggerType = null;
+	/**
+	 * Input into the instr command, the rotator speed. One of 'slow' / 'fast'. MOPTOP only.
+	 */
+	protected String rotorSpeed = null;
 	/**
 	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/IO:THOR only.
 	 */
@@ -240,6 +244,16 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set the rotor speed to the INSTR command. Used by MOPTOP.
+	 * @param rs The rotor speed, one of 'slow' / 'fast'.
+	 * @see #rotorSpeed
+	 */
+	public void setRotorSpeed(String rs)
+	{
+		rotorSpeed = rs;
+	}
+
+	/**
 	 * Set the input EM Gain to the INSTR command. Used by RINGO3/THOR.
 	 * @param g The emGain. Usually 1, 10 or 100.
 	 * @see #emGain
@@ -299,6 +313,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #xBinning
 	 * @see #yBinning
 	 * @see #triggerType
+	 * @see #rotorSpeed
 	 * @see #emGain
 	 * @see #window
 	 * @see #calibrateBefore
@@ -400,6 +415,12 @@ class Instr extends TOCCommand implements Logging, Runnable
 			// INSTR <session id> RINGO3 <internal|external> <emgain> <xbin> <ybin>
 			commandString = new String(commandString+triggerType+" "+emGain+" "+xBinning+" "+yBinning);
 		}
+		else if(instID.equals("MOPTOP"))
+		{
+			// INSTR <session id> MOPTOP <rotorSpeed> <filter> <xbin> <ybin>
+			commandString = new String(commandString+rotorSpeed+" "+filterList[SINGLE_FILTER_INDEX]+" "+
+						   xBinning+" "+yBinning);
+		}
 		else if(instID.equals("IO:THOR"))
 		{
 			// INSTR <sessionId> IO:THOR <emgain> <binxy> <xs> <xe> <ys> <ye> 
@@ -460,6 +481,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String irFilterString = null;
 		String singleFilterString = null;
 		String triggerTypeString = null;
+		String rotorSpeedString = null;
 		String emGainString = null;
 		InstrWindow win = null;
 		String calibrateBeforeString = null;
@@ -470,15 +492,21 @@ class Instr extends TOCCommand implements Logging, Runnable
 
 		if(args.length < 2)
 		{
-			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>] <calibrate before> <calibrate after>");
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR.");
-			System.out.println("The first set of optional parameters are for RATCAM, the second for IRCAM/IO:O and the third for FIXEDSPEC, the fourth for RINGO3.");
+			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>][<rotorSpeed> <filter> <xbin> <ybin>] <calibrate before> <calibrate after>");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP.");
+			System.out.println("Additional parameters for RATCAM : - [<lfilter> <ufilter> <bin>].");
+			System.out.println("Additional parameters for IRCAM/IO:O : - [<single filter> <bin>].");
+			System.out.println("Additional parameters for FIXEDSPEC : - [<xbin> <ybin>].");
+			System.out.println("Additional parameters for RINGO3 : - [<trigger type> <emgain> <bin>].");
+			System.out.println("Additional parameters for IO:THOR : - <emgain> <bin> <xs> <ys> <xe> <ye>].");
+			System.out.println("Additional parameters for MOPTOP : - [<rotorSpeed> <filter> <bin>].");
 			System.exit(1);
 		}
 		inputPropertiesFile = new File(args[0]);
 		instID = args[1];
 		if(instID.equals("RATCAM"))
 		{
+			// <lfilter> <ufilter> <bin>
 			if(args.length != 7)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
@@ -493,6 +521,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("IRCAM"))
 		{
+			// <single filter> <bin>
 			if(args.length != 6)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
@@ -506,6 +535,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("IO:O"))
 		{
+			// <single filter> <bin>
 			if(args.length != 6)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
@@ -519,6 +549,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("FIXEDSPEC"))
 		{
+			// <xbin> <ybin>
 			if(args.length != 6)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
@@ -531,6 +562,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("RINGO3"))
 		{
+			// <trigger type> <emgain> <bin>
 			if(args.length != 7)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
@@ -562,10 +594,25 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[8];
 			calibrateAfterString = args[9];
 		}
+		else if(instID.equals("MOPTOP"))
+		{
+			// <rotorSpeed> <filter> <bin>
+			if(args.length != 7)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			rotorSpeedString = args[2];
+			singleFilterString = args[3];
+			xBinningString = args[4];
+			yBinningString = args[4];
+			calibrateBeforeString = args[5];
+			calibrateAfterString = args[6];
+		}
 		// diddly FrodoSpec
 		else
 		{
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O or FIXEDSPEC.");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP.");
 			System.exit(1);
 		}
 		// convert emGain strings into number
@@ -620,6 +667,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 			instr.setSingleFilter(singleFilterString);
 		if(triggerTypeString != null)
 			instr.setTriggerType(triggerTypeString);
+		if(rotorSpeedString != null)
+			instr.setRotorSpeed(rotorSpeedString);
 		instr.setEMGain(emGain);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
