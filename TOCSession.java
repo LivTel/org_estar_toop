@@ -635,6 +635,39 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the LIRIC instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param filterType A string representing the filter type string, i.e. Barr-H.
+	 * @param nudgematicOffsetSize A string describing the nudgematic offset size to use, one of : 'small','large',
+	 *        'none'.
+	 * @param coaddExposureLength An integer describing the coadd exposure length to use in milliseconds, 
+	 *        either 100 or 1000.
+	 * @param xBin How to bin the chip in X.
+	 * @param yBin How to bin the chip in Y.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrLiric(String filterType,String nudgematicOffsetSize,int coaddExposureLength,int xBin,int yBin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("LIRIC");
+		instr.setSingleFilter(filterType);
+		instr.setNudgematicOffsetSize(nudgematicOffsetSize);
+		instr.setCoaddExposureLength(coaddExposureLength);
+		instr.setXBinning(xBin);
+		instr.setYBinning(yBin);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+
+	/**
 	 * Configure the FIXEDSPEC instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
 	 * @param xBin How to bin the chip in X.

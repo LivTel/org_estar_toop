@@ -10,10 +10,10 @@ JAR_FILE	=org_$(ESTAR_NAME)_$(TOOP_NAME).jar
 JAVACFLAGS 	=$(JAVAC_VERSION_FLAGS) -d $(LIBDIR) -sourcepath ../../../ -classpath $(LIBDIR):$(CLASSPATH)
 DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
-SRCS = TOCAClient.java TOCException.java TOCSession.java TOCSessionData.java TOCCommand.java \
+SRCS = TOCAClient.java TOCException.java TOCCommand.java \
 	Acquire.java AgRadial.java Auto.java Expose.java Helo.java Init.java Instr.java \
 	Position.java Offset.java Quit.java \
-	Slew.java Status.java Stop.java When.java
+	Slew.java Status.java Stop.java When.java TOCSession.java TOCSessionData.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)
 CONFIGS = 

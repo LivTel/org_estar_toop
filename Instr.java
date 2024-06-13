@@ -100,6 +100,14 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	protected String rotorSpeed = null;
 	/**
+	 * Input into the instr command, the nudgematic offset size. One of 'small' / 'large' / 'none'. LIRIC only.
+	 */
+	protected String nudgematicOffsetSize = null;
+	/**
+	 * Input into the instr command, the coadd exposure length to use in milliseconds. One of 100 / 1000. LIRIC only.
+	 */
+	protected int coaddExposureLength = 1000;
+	/**
 	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/IO:THOR only.
 	 */
 	protected int emGain = 0;
@@ -254,6 +262,26 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set the nudgematic offset size used by the INSTR command. Used by LIRIC.
+	 * @param nos The nudgematic offset size , one of 'small' / 'large' / 'none'.
+	 * @see #nudgematicOffsetSize
+	 */
+	public void setNudgematicOffsetSize(String nos)
+	{
+		nudgematicOffsetSize = nos;
+	}
+
+	/**
+	 * Set the coadd exposure length used by the INSTR command. Used by LIRIC.
+	 * @param cel The coadd exposure length , one of 100 / 1000.
+	 * @see #coaddExposureLength
+	 */
+	public void setCoaddExposureLength(int cel)
+	{
+		coaddExposureLength = cel;
+	}
+	
+	/**
 	 * Set the input EM Gain to the INSTR command. Used by RINGO3/THOR.
 	 * @param g The emGain. Usually 1, 10 or 100.
 	 * @see #emGain
@@ -314,6 +342,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #yBinning
 	 * @see #triggerType
 	 * @see #rotorSpeed
+	 * @see #nudgematicOffsetSize
+	 * @see #coaddExposureLength
 	 * @see #emGain
 	 * @see #window
 	 * @see #calibrateBefore
@@ -421,6 +451,12 @@ class Instr extends TOCCommand implements Logging, Runnable
 			commandString = new String(commandString+rotorSpeed+" "+filterList[SINGLE_FILTER_INDEX]+" "+
 						   xBinning+" "+yBinning);
 		}
+		else if(instID.equals("LIRIC"))
+		{
+			// INSTR <session id> LIRIC <nudgematicOffsetSize> <coaddExposureLength> <filter> <xbin> <ybin>
+			commandString = new String(commandString+nudgematicOffsetSize+" "+coaddExposureLength+" "+
+						   filterList[SINGLE_FILTER_INDEX]+" "+xBinning+" "+yBinning);
+		}
 		else if(instID.equals("IO:THOR"))
 		{
 			// INSTR <sessionId> IO:THOR <emgain> <binxy> <xs> <xe> <ys> <ye> 
@@ -482,24 +518,27 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String singleFilterString = null;
 		String triggerTypeString = null;
 		String rotorSpeedString = null;
+		String nudgematicOffsetSizeString = null;
+		String coaddExposureLengthString = null;
 		String emGainString = null;
 		InstrWindow win = null;
 		String calibrateBeforeString = null;
 		String calibrateAfterString = null;
 		Boolean b = null;
-		int xBinning,yBinning,emGain=0;
+		int xBinning,yBinning,emGain=0,coaddExposureLength=1000;
 		boolean calibrateBefore,calibrateAfter;
 
 		if(args.length < 2)
 		{
-			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>][<rotorSpeed> <filter> <xbin> <ybin>] <calibrate before> <calibrate after>");
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP.");
+			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>][<rotorSpeed> <filter> <xbin> <ybin>][<nudgematicOffsetSize> <coaddExposureLength> <filter> <xbin> <ybin>] <calibrate before> <calibrate after>");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP, LIRIC.");
 			System.out.println("Additional parameters for RATCAM : - [<lfilter> <ufilter> <bin>].");
 			System.out.println("Additional parameters for IRCAM/IO:O : - [<single filter> <bin>].");
 			System.out.println("Additional parameters for FIXEDSPEC : - [<xbin> <ybin>].");
 			System.out.println("Additional parameters for RINGO3 : - [<trigger type> <emgain> <bin>].");
 			System.out.println("Additional parameters for IO:THOR : - <emgain> <bin> <xs> <ys> <xe> <ye>].");
 			System.out.println("Additional parameters for MOPTOP : - [<rotorSpeed> <filter> <bin>].");
+			System.out.println("Additional parameters for LIRIC : - [<nudgematicOffsetSize> <coaddExposureLength> <filter> <bin>].");
 			System.exit(1);
 		}
 		inputPropertiesFile = new File(args[0]);
@@ -609,15 +648,34 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[5];
 			calibrateAfterString = args[6];
 		}
+		else if(instID.equals("LIRIC"))
+		{
+			// <nudgematicOffsetSize> <coaddExposureLength> <filter> <bin>
+			if(args.length != 8)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+		        nudgematicOffsetSizeString = args[2];
+			coaddExposureLengthString = args[3];
+			singleFilterString = args[4];
+			xBinningString = args[5];
+			yBinningString = args[5];
+			calibrateBeforeString = args[6];
+			calibrateAfterString = args[7];
+		}
 		// diddly FrodoSpec
 		else
 		{
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP.");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP, LIRIC.");
 			System.exit(1);
 		}
 		// convert emGain strings into number
 		if(emGainString != null)
 			emGain = Integer.parseInt(emGainString);
+		// convert coadd exposure length string into a number
+		if(coaddExposureLengthString != null)
+			coaddExposureLength = Integer.parseInt(coaddExposureLengthString);
 		// convert binning strings to numbers
 		xBinning = Integer.parseInt(xBinningString);
 		yBinning = Integer.parseInt(yBinningString);
@@ -669,6 +727,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 			instr.setTriggerType(triggerTypeString);
 		if(rotorSpeedString != null)
 			instr.setRotorSpeed(rotorSpeedString);
+		if(nudgematicOffsetSizeString != null)
+			instr.setNudgematicOffsetSize(nudgematicOffsetSizeString);
+		instr.setCoaddExposureLength(coaddExposureLength);
 		instr.setEMGain(emGain);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
