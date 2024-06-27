@@ -76,8 +76,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 */
 	public final static int NUVIEW_WAVELENGTH_FILTER_INDEX = 0;
 	/**
-	 * The instrument name - RATCAM, EA01, EM01, NUVSPEC, FIXEDSPEC, IRCAM, RINGOSTAR, GROPE, IO:O, RINGO3, IO:THOR, MOPTOP.
+	 * The instrument name - FIXEDSPEC, IO:O, LIRIC, MOPTOP, RISE, SPRAT.
 	 */
+	// RATCAM, EA01, EM01, NUVSPEC, IRCAM, RINGOSTAR, GROPE, RINGO3, IO:THOR, 
 	protected String instID = null;
 	/**
 	 * A list of filters to configure the instrument.
@@ -111,6 +112,18 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * Input into the instr command, the EMGain. Number, usually 1,10 or 100. RINGO3/IO:THOR only.
 	 */
 	protected int emGain = 0;
+	/**
+	 * Input into the instr command, the slit position. One of 'in' / 'out'. SPRAT only.
+	 */
+	protected String slitPosition = null;
+	/**
+	 * Input into the instr command, the grism position. One of 'in' / 'out'. SPRAT only.
+	 */
+	protected String grismPosition = null;
+	/**
+	 * Input into the instr command, the grism position. One of 'red' / 'blue'. SPRAT only.
+	 */
+	protected String grismRotation = null;
 	/**
 	 * Input into the instr command, a window. Used for THOR only.
 	 * @see #window
@@ -292,6 +305,36 @@ class Instr extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set the slit position to the INSTR command. Used by SPRAT.
+	 * @param pos The slit position, one of 'in' or 'out' (of the beam).
+	 * @see #slitPosition
+	 */
+	public void setSlitPosition(String pos)
+	{
+		slitPosition = pos;
+	}
+
+	/**
+	 * Set the grism position to the INSTR command. Used by SPRAT.
+	 * @param pos The grism position, one of 'in' or 'out' (of the beam).
+	 * @see #grismPosition
+	 */
+	public void setGrismPosition(String pos)
+	{
+		grismPosition = pos;
+	}
+
+	/**
+	 * Set the grism rotation to the INSTR command. Used by SPRAT.
+	 * @param pos The grism rotation, one of 'red' or 'blue'.
+	 * @see #grismRotation
+	 */
+	public void setGrismRotation(String pos)
+	{
+		grismRotation = pos;
+	}
+
+	/**
 	 * Set the input window o the INSTR command. Used by THOR.
 	 * @param xStart The X Start position of the window, in pixels.
 	 * @param yStart The Y Start position of the window, in pixels.
@@ -345,6 +388,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 	 * @see #nudgematicOffsetSize
 	 * @see #coaddExposureLength
 	 * @see #emGain
+	 * @see #slitPosition
+	 * @see #grismPosition
+	 * @see #grismRotation
 	 * @see #window
 	 * @see #calibrateBefore
 	 * @see #calibrateAfter
@@ -453,9 +499,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("LIRIC"))
 		{
-			// INSTR <session id> LIRIC <nudgematicOffsetSize> <coaddExposureLength> <filter> <xbin> <ybin>
+			// INSTR <session id> LIRIC <nudgematicOffsetSize> <coaddExposureLength> <filter>
 			commandString = new String(commandString+nudgematicOffsetSize+" "+coaddExposureLength+" "+
-						   filterList[SINGLE_FILTER_INDEX]+" "+xBinning+" "+yBinning);
+						   filterList[SINGLE_FILTER_INDEX]);
 		}
 		else if(instID.equals("IO:THOR"))
 		{
@@ -463,6 +509,11 @@ class Instr extends TOCCommand implements Logging, Runnable
 			commandString = new String(commandString+emGain+" "+xBinning+" "+window.getXStart()+" "+
 						   window.getXEnd()+" "+window.getYStart()+" "+window.getYEnd());
 
+		}
+		else if(instID.equals("SPRAT"))
+		{
+			// INSTR <session id> SPRAT <slit:in|out> <grism:in|out> <grism:red|blue>
+			commandString = new String(commandString+slitPosition+" "+grismPosition+" "+grismRotation);
 		}
 		// diddly FRODOSPEC TODO
 		else
@@ -520,6 +571,9 @@ class Instr extends TOCCommand implements Logging, Runnable
 		String rotorSpeedString = null;
 		String nudgematicOffsetSizeString = null;
 		String coaddExposureLengthString = null;
+		String slitPositionString = null;
+		String grismPositionString = null;
+		String grismRotationString = null;
 		String emGainString = null;
 		InstrWindow win = null;
 		String calibrateBeforeString = null;
@@ -530,15 +584,17 @@ class Instr extends TOCCommand implements Logging, Runnable
 
 		if(args.length < 2)
 		{
-			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<lfilter> <ufilter> <bin>]|[<single filter> <bin>]|[<xbin> <ybin>]|[<trigger type> <emgain> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>][<rotorSpeed> <filter> <xbin> <ybin>][<nudgematicOffsetSize> <coaddExposureLength> <filter> <xbin> <ybin>] <calibrate before> <calibrate after>");
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP, LIRIC.");
-			System.out.println("Additional parameters for RATCAM : - [<lfilter> <ufilter> <bin>].");
-			System.out.println("Additional parameters for IRCAM/IO:O : - [<single filter> <bin>].");
+			System.out.println("java org.estar.toop.Instr <input properties filename> <inst ID> [<single filter> <bin>]|[<xbin> <ybin>][<trigger type> <emgain> <bin>][<nudgematicOffsetSize> <coaddExposureLength> <filter>][<rotorSpeed> <filter> <xbin> <ybin>][<bin>][<slit position> <grism position> <grism rotation>] <calibrate before> <calibrate after>");//  [<lfilter> <ufilter> <bin>][<emgain> <bin> <xs> <ys> <xe> <ye>]
+			System.out.println("Instrument ID must be one of IO:O, FIXEDSPEC,  LIRIC, MOPTOP, RISE, SPRAT.");// RATCAM,RINGO3, IRCAM,IO:THOR,
+			//System.out.println("Additional parameters for RATCAM : - [<lfilter> <ufilter> <bin>].");
+			System.out.println("Additional parameters for IO:O : - [<single filter> <bin>].");
 			System.out.println("Additional parameters for FIXEDSPEC : - [<xbin> <ybin>].");
-			System.out.println("Additional parameters for RINGO3 : - [<trigger type> <emgain> <bin>].");
-			System.out.println("Additional parameters for IO:THOR : - <emgain> <bin> <xs> <ys> <xe> <ye>].");
+			//System.out.println("Additional parameters for RINGO3 : - [<trigger type> <emgain> <bin>].");
+			//System.out.println("Additional parameters for IO:THOR : - <emgain> <bin> <xs> <ys> <xe> <ye>].");
+			System.out.println("Additional parameters for LIRIC : - [<nudgematicOffsetSize> <coaddExposureLength> <filter>].");
 			System.out.println("Additional parameters for MOPTOP : - [<rotorSpeed> <filter> <bin>].");
-			System.out.println("Additional parameters for LIRIC : - [<nudgematicOffsetSize> <coaddExposureLength> <filter> <bin>].");
+			System.out.println("Additional parameters for RISE : - [<bin>].");
+			System.out.println("Additional parameters for SPRAT : - [<slit position> <grism position> <grism rotation>].");
 			System.exit(1);
 		}
 		inputPropertiesFile = new File(args[0]);
@@ -650,8 +706,8 @@ class Instr extends TOCCommand implements Logging, Runnable
 		}
 		else if(instID.equals("LIRIC"))
 		{
-			// <nudgematicOffsetSize> <coaddExposureLength> <filter> <bin>
-			if(args.length != 8)
+			// <nudgematicOffsetSize> <coaddExposureLength> <filter>
+			if(args.length != 7)
 			{
 				System.err.println("Wrong number of arguments: "+args.length+".");
 				System.exit(1);
@@ -659,10 +715,35 @@ class Instr extends TOCCommand implements Logging, Runnable
 		        nudgematicOffsetSizeString = args[2];
 			coaddExposureLengthString = args[3];
 			singleFilterString = args[4];
-			xBinningString = args[5];
-			yBinningString = args[5];
-			calibrateBeforeString = args[6];
-			calibrateAfterString = args[7];
+			calibrateBeforeString = args[5];
+			calibrateAfterString = args[6];
+		}
+		else if(instID.equals("RISE"))
+		{
+			// <bin>
+			if(args.length != 5)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			xBinningString = args[2];
+			yBinningString = args[2];
+			calibrateBeforeString = args[3];
+			calibrateAfterString = args[4];
+		}
+		else if(instID.equals("SPRAT"))
+		{
+			// <slit position> <grism position> <grism rotation>
+			if(args.length != 7)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+		        slitPositionString = args[2];
+			grismPositionString = args[3];
+			grismRotationString = args[4];
+			calibrateBeforeString = args[5];
+			calibrateAfterString = args[6];
 		}
 		// diddly FrodoSpec
 		else
@@ -677,8 +758,14 @@ class Instr extends TOCCommand implements Logging, Runnable
 		if(coaddExposureLengthString != null)
 			coaddExposureLength = Integer.parseInt(coaddExposureLengthString);
 		// convert binning strings to numbers
-		xBinning = Integer.parseInt(xBinningString);
-		yBinning = Integer.parseInt(yBinningString);
+		if(xBinningString != null)
+			xBinning = Integer.parseInt(xBinningString);
+		else
+			xBinning = 1;
+		if(yBinningString != null)
+			yBinning = Integer.parseInt(yBinningString);
+		else
+			yBinning = 1;
 		// convert calibrate before and after strings to booleans
 		b = Boolean.valueOf(calibrateBeforeString);
 		calibrateBefore = b.booleanValue();
@@ -731,6 +818,12 @@ class Instr extends TOCCommand implements Logging, Runnable
 			instr.setNudgematicOffsetSize(nudgematicOffsetSizeString);
 		instr.setCoaddExposureLength(coaddExposureLength);
 		instr.setEMGain(emGain);
+		if(slitPositionString != null)
+			instr.setSlitPosition(slitPositionString);
+		if(grismPositionString != null)
+			instr.setGrismPosition(grismPositionString);
+		if(grismRotationString != null)
+			instr.setGrismRotation(grismRotationString);
 		instr.setXBinning(xBinning);
 		instr.setYBinning(yBinning);
 		if(win != null)
