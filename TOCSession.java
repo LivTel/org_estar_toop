@@ -39,7 +39,8 @@ import org.estar.astrometry.*;
  * ts.helo();
  * ts.init();
  * ts.slew("a-star","01:02:03","+45:56:01");
- * ts.instrRatcam("SDSS-R","clear",2,false,false);
+ * ts.focalPlane("IO:O");
+ * ts.instrIOO({"","SDSS-R","clear","clear"},2,false,false);
  * ts.expose(10000,1,true);
  * for(int i = 0;i < ts.getExposeFilenameCount(); i++)
  *     System.out.println(""+i+" "+ts.getExposeFilename(i));
@@ -123,6 +124,10 @@ public class TOCSession implements Logging
 	 */
 	private Acquire acquire = null;
 	/**
+	 * FocalPlane reference.
+	 */
+	private FocalPlane focalPlane = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -152,6 +157,7 @@ public class TOCSession implements Logging
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
+	 * @see #focalPlane
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -172,6 +178,7 @@ public class TOCSession implements Logging
 		auto = new Auto();
 		agRadial = new AgRadial();
 		acquire = new Acquire();
+		focalPlane = new FocalPlane();
 		instr = new Instr();
 		expose = new Expose();
 		stop = new Stop();
@@ -192,6 +199,7 @@ public class TOCSession implements Logging
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
+	 * @see #focalPlane
 	 * @see #instr
 	 * @see #expose
 	 * @see #stop
@@ -210,6 +218,7 @@ public class TOCSession implements Logging
 		auto.setSessionData(sessionData);
 		agRadial.setSessionData(sessionData);
 		acquire.setSessionData(sessionData);
+		focalPlane.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
@@ -475,6 +484,24 @@ public class TOCSession implements Logging
 		if(acquire.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":acquire failed:"+acquire.getErrorString());
+		}
+	}
+
+	/**
+	 * Configure the focal plane (telescope aperture offset) for an instrument.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param instrumentName The name of the instrument.
+	 * @exception TOCException Thrown if the focal plane command fails.
+	 * @see #focalPlane
+	 */
+	public void focalPlane(String instrumentName) throws TOCException
+	{
+		focalPlane.setInstrumentName(instrumentName);
+		focalPlane.run();
+		if(focalPlane.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":focal plane failed:"+
+					       focalPlane.getErrorString());
 		}
 	}
 
