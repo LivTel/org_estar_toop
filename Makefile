@@ -12,7 +12,7 @@ DOCSDIR 	= $(ESTAR_DOC_HOME)/javadocs/$(PACKAGEDIR)
 
 SRCS = TOCAClient.java TOCException.java TOCCommand.java \
 	Acquire.java AgRadial.java Arc.java Auto.java Expose.java FocalPlane.java Helo.java Init.java Instr.java \
-	Position.java Offset.java Quit.java \
+	Position.java Offset.java Quit.java Rotator.java \
 	Slew.java Status.java Stop.java When.java TOCSession.java TOCSessionData.java 
 OBJS = $(SRCS:%.java=$(LIBDIR)/$(PACKAGEDIR)/%.class)
 DOCS = $(SRCS:%.java=$(DOCSDIR)/$(PACKAGEDIR)/%.html)

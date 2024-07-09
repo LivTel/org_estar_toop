@@ -112,6 +112,10 @@ public class TOCSession implements Logging
 	 */
 	private Offset offset = null;
 	/**
+	 * Rotator reference.
+	 */
+	private Rotator rotator = null;
+	/**
 	 * Auto reference.
 	 */
 	private Auto auto = null;
@@ -158,6 +162,7 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #rotator
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
@@ -180,6 +185,7 @@ public class TOCSession implements Logging
 		init = new Init();
 		slew = new Slew();
 		offset = new Offset();
+		rotator = new Rotator();
 		auto = new Auto();
 		agRadial = new AgRadial();
 		acquire = new Acquire();
@@ -202,6 +208,7 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #rotator
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
@@ -222,6 +229,7 @@ public class TOCSession implements Logging
 		init.setSessionData(sessionData);
 		slew.setSessionData(sessionData);
 		offset.setSessionData(sessionData);
+		rotator.setSessionData(sessionData);
 		auto.setSessionData(sessionData);
 		agRadial.setSessionData(sessionData);
 		acquire.setSessionData(sessionData);
@@ -405,6 +413,27 @@ public class TOCSession implements Logging
 		if(offset.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":offset failed:"+offset.getErrorString());
+		}
+	}
+
+	/**
+	 * Change the rotator setting (from the default set in the INIT command)
+	 * after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> and <b>init</b> before this method. 
+	 * @param rotatorMode The mode to configure the rotator, one of "SKY", "MOUNT" or "FLOAT".
+	 * @param mountAngle If the rotator mode is "MOUNT", the mount angle to move the rotator to (in degrees),
+	 *                   before floating the rotator.
+	 * @exception TOCException Thrown if the offset command fails.
+	 * @see #rotator
+	 */
+	public void rotator(String rotatorMode, double mountAngle) throws TOCException
+	{
+		rotator.setRotatorMode(rotatorMode);
+		rotator.setMountAngle(mountAngle);
+		rotator.run();
+		if(rotator.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":rotator failed:"+rotator.getErrorString());
 		}
 	}
 
@@ -1091,6 +1120,9 @@ public class TOCSession implements Logging
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Quit");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Rotator");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Slew");
