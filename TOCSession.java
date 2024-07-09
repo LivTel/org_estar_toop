@@ -451,17 +451,20 @@ public class TOCSession implements Logging
 	 * @param ra The right ascension to acquire to.
 	 * @param dec The declination to acquire to.
 	 * @param acquireMode Which method to use to acquire.
+	 * @param highPrecision A boolean, if true we do a HIGH precision acquisition, 
+	 *                      otherwise we do a NORMAL acquisition.
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @see #acquire
 	 * @see #ACQUIRE_MODE_NONE
 	 * @see #ACQUIRE_MODE_BRIGHTEST
 	 * @see #ACQUIRE_MODE_WCS
 	 */
-	public void acquire(RA ra,Dec dec,String acquireMode) throws TOCException
+	public void acquire(RA ra,Dec dec,String acquireMode,boolean highPrecision) throws TOCException
 	{
 		acquire.setRA(ra);
 		acquire.setDec(dec);
 		acquire.setAcquireMode(acquireMode);
+		acquire.setPrecision(highPrecision);
 		acquire.run();
 		if(acquire.getSuccessful() == false)
 		{
@@ -475,6 +478,7 @@ public class TOCSession implements Logging
 	 * @param raString A string representing the right ascension, in the format HH:MM:SS.ss.
 	 * @param decString A string representing the declination, in the format [+|-]DD:MM:SS.ss.
 	 * @param acquireMode Which method to use to acquire.
+	 * @param precisionString The precision to use when acquiring, one of "NORMAL" or "HIGH".
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @exception NumberFormatException Thrown if the RA/Dec parsing fails.
 	 * @see #acquire
@@ -482,12 +486,13 @@ public class TOCSession implements Logging
 	 * @see #ACQUIRE_MODE_BRIGHTEST
 	 * @see #ACQUIRE_MODE_WCS
 	 */
-	public void acquire(String raString,String decString,String acquireMode) throws TOCException, 
-											NumberFormatException
+	public void acquire(String raString,String decString,String acquireMode,String precisionString) throws
+		TOCException, NumberFormatException
 	{
 		acquire.setRA(raString);
 		acquire.setDec(decString);
 		acquire.setAcquireMode(acquireMode);
+		acquire.setPrecision(precisionString);
 		acquire.run();
 		if(acquire.getSuccessful() == false)
 		{
