@@ -32,14 +32,14 @@ import org.estar.astrometry.*;
 /** 
  * Acquire command implementation.
  * @author Steve Fraser, Chris Mottram
- * @version $Revision: 1.2 $
+ * @version $Revision$
  */
 class Acquire extends TOCCommand implements Logging, Runnable
 {
 	/**
 	 * Revision control system version id.
 	 */
-	public final static String RCSID = "$Id: Acquire.java,v 1.2 2008-03-28 16:46:46 cjm Exp $";
+	public final static String RCSID = "$Id$";
 	/**
 	 * Classname for logging.
 	 */
@@ -63,7 +63,10 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	 * @see TOCSession#ACQUIRE_MODE_WCS
 	 */
 	protected String acquireMode = TOCSession.ACQUIRE_MODE_NONE;
-
+	/**
+	 * Whether to do a NORMAL (highPrecision = false) or HIGH precision (highPrecision = true) acquisition.
+	 */
+	protected boolean highPrecision = false;
 	/**
 	 * Default constructor.
 	 */
@@ -130,6 +133,43 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	}
 
 	/**
+	 * Set whether the acquision threshold should be NORMAL or HIGH precision.
+	 * @param s A string, either "NORMAL" or "HIGH".
+	 * @see #highPrecision
+	 * @exception NullPointerException Thrown if s is null.
+	 * @exception IllegalArgumentException Thrown if s is NOT one of "NORMAL" or "HIGH".
+	 */
+	public void setPrecision(String s) throws NullPointerException, IllegalArgumentException
+	{
+		if(s ==null)
+		{
+			throw new NullPointerException(this.getClass().getName()+
+							   ":setPrecision: No precision string specified.");	
+		}
+		if(s.equalsIgnoreCase("NORMAL"))
+			setPrecision(false);
+		else if(s.equalsIgnoreCase("HIGH"))
+			setPrecision(true);
+		else
+		{
+			throw new IllegalArgumentException(this.getClass().getName()+
+							   ":setPrecision: Illegal precision:"+s);
+		}
+	}
+
+	/**
+	 * Set whether the acquision threshold should be NORMAL (false) or HIGH precision (true).
+	 * @param b A boolean, if true the high precision threshold is used, 
+	 *       otherwise the normal precision threshold is used.
+	 * @see #highPrecision
+
+	 */
+	public void setPrecision(boolean b)
+	{
+		highPrecision = b;
+	}
+
+	/**
 	 * Run method. 
 	 * Setup commandString.
 	 * Call TOCCommand.run.
@@ -138,6 +178,7 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	 * @see #COMMAND_NAME
 	 * @see #commandString
 	 * @see #acquireMode
+	 * @see #highPrecision
 	 * @see #ra
 	 * @see #dec
 	 * @see #sessionData
@@ -147,10 +188,17 @@ class Acquire extends TOCCommand implements Logging, Runnable
 	 */
 	public void run()
 	{
+		String precisionString = null;
+
+		if(highPrecision)
+			precisionString = new String("HIGH");
+		else
+			precisionString = new String("NORMAL");
 		commandString = new String(COMMAND_NAME+" "+sessionData.getSessionId()+
 					   " "+ra.toString(':')+
 					   " "+dec.toString(':')+
-					   " "+acquireMode);
+					   " "+acquireMode+
+					   " "+precisionString);
 		super.run();
 		// results
 		if(getSuccessful())
@@ -174,18 +222,20 @@ class Acquire extends TOCCommand implements Logging, Runnable
 		File inputPropertiesFile = null;
 		Logger l = null;
 		String acquireMode = null;
+		String precisionString = null;
 		String raString = null;
 		String decString = null;
 
-		if(args.length != 4)
+		if(args.length != 5)
 		{
-			System.out.println("java org.estar.toop.Acquire <input properties filename> <RA> <Dec> <acquire mode> ");
+			System.out.println("java org.estar.toop.Acquire <input properties filename> <RA> <Dec> <acquire mode> <precision>");
 			System.exit(1);
 		}
 		inputPropertiesFile = new File(args[0]);
 		raString = args[1];
 		decString = args[2];
 		acquireMode = args[3];
+		precisionString = args[4];
 		// setup logger
 		ConsoleLogHandler console = new ConsoleLogHandler(new BasicLogFormatter(150));
 		console.setLogLevel(ALL);
@@ -219,6 +269,7 @@ class Acquire extends TOCCommand implements Logging, Runnable
 		acquire.setRA(raString);
 		acquire.setDec(decString);
 		acquire.setAcquireMode(acquireMode);
+		acquire.setPrecision(precisionString);
 		acquire.run();
 		if(acquire.getSuccessful())
 		{
