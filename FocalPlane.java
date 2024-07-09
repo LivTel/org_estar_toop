@@ -18,7 +18,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 // FocalPlane.java
-// $Header: /space/home/eng/cjm/cvs/org_estar_toop/FocalPlane.java,v 1.10 2013-06-03 10:32:35 cjm Exp $
+// $Header$
 package org.estar.toop;
 
 import java.io.*;
@@ -88,7 +88,7 @@ class FocalPlane extends TOCCommand implements Logging, Runnable
 	{
 		// create command string
 		commandString = new String(COMMAND_NAME+" "+sessionData.getSessionId()+" "+instrumentName+" ");
-		// run the INSTR command
+		// run the FOCALPLANE command
 		super.run();
 		// results
 		if(getSuccessful())
