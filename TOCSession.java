@@ -767,7 +767,34 @@ public class TOCSession implements Logging
 	{
 		instr("NUVSPEC",wavelengthString,null,null,1,1,calibrateBefore,calibrateAfter);
 	}
-
+	
+	/**
+	 * Configure the SPRAT instrument, and make it the current TOCA instrument.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param slitPositionString Whether the slit should be "in" or "out" of the beam.
+	 * @param grismPositionString Whether the grism should be "in" or "out" of the beam.
+	 * @param grismRotationString Whether the grism should be rotated to the "red" or "blue" position.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrSprat(String slitPositionString,String grismPositionString,String grismRotationString,
+			       boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("SPRAT");
+		instr.setSlitPosition(slitPositionString);
+		instr.setGrismPosition(grismPositionString);
+		instr.setGrismRotation(grismRotationString);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+	
 	/**
 	 * Configure the RINGOSTAR instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
