@@ -39,7 +39,8 @@ import org.estar.astrometry.*;
  * ts.helo();
  * ts.init();
  * ts.slew("a-star","01:02:03","+45:56:01");
- * ts.instrRatcam("SDSS-R","clear",2,false,false);
+ * ts.focalPlane("IO:O");
+ * ts.instrIOO({"","SDSS-R","clear","clear"},2,false,false);
  * ts.expose(10000,1,true);
  * for(int i = 0;i < ts.getExposeFilenameCount(); i++)
  *     System.out.println(""+i+" "+ts.getExposeFilename(i));
@@ -111,6 +112,10 @@ public class TOCSession implements Logging
 	 */
 	private Offset offset = null;
 	/**
+	 * Rotator reference.
+	 */
+	private Rotator rotator = null;
+	/**
 	 * Auto reference.
 	 */
 	private Auto auto = null;
@@ -123,6 +128,10 @@ public class TOCSession implements Logging
 	 */
 	private Acquire acquire = null;
 	/**
+	 * FocalPlane reference.
+	 */
+	private FocalPlane focalPlane = null;
+	/**
 	 * Instr reference.
 	 */
 	private Instr instr = null;
@@ -130,6 +139,10 @@ public class TOCSession implements Logging
 	 * Expose reference.
 	 */
 	private Expose expose = null;
+	/**
+	 * Arc reference.
+	 */
+	private Arc arc = null;
 	/**
 	 * Stop reference.
 	 */
@@ -149,11 +162,14 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #rotator
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
+	 * @see #focalPlane
 	 * @see #instr
 	 * @see #expose
+	 * @see #arc
 	 * @see #stop
 	 * @see #quit
 	 */
@@ -169,11 +185,14 @@ public class TOCSession implements Logging
 		init = new Init();
 		slew = new Slew();
 		offset = new Offset();
+		rotator = new Rotator();
 		auto = new Auto();
 		agRadial = new AgRadial();
 		acquire = new Acquire();
+		focalPlane = new FocalPlane();
 		instr = new Instr();
 		expose = new Expose();
+		arc = new Arc();
 		stop = new Stop();
 		quit = new Quit();
 	}
@@ -189,11 +208,14 @@ public class TOCSession implements Logging
 	 * @see #init
 	 * @see #slew
 	 * @see #offset
+	 * @see #rotator
 	 * @see #auto
 	 * @see #agRadial
 	 * @see #acquire
+	 * @see #focalPlane
 	 * @see #instr
 	 * @see #expose
+	 * @see #arc
 	 * @see #stop
 	 * @see #quit
 	 */
@@ -207,11 +229,14 @@ public class TOCSession implements Logging
 		init.setSessionData(sessionData);
 		slew.setSessionData(sessionData);
 		offset.setSessionData(sessionData);
+		rotator.setSessionData(sessionData);
 		auto.setSessionData(sessionData);
 		agRadial.setSessionData(sessionData);
 		acquire.setSessionData(sessionData);
+		focalPlane.setSessionData(sessionData);
 		instr.setSessionData(sessionData);
 		expose.setSessionData(sessionData);
+		arc.setSessionData(sessionData);
 		stop.setSessionData(sessionData);
 		quit.setSessionData(sessionData);
 	}
@@ -392,6 +417,27 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Change the rotator setting (from the default set in the INIT command)
+	 * after starting a RCS TOCA session using helo.
+	 * You should have called <b>helo</b> and <b>init</b> before this method. 
+	 * @param rotatorMode The mode to configure the rotator, one of "SKY", "MOUNT" or "FLOAT".
+	 * @param mountAngle If the rotator mode is "MOUNT", the mount angle to move the rotator to (in degrees),
+	 *                   before floating the rotator.
+	 * @exception TOCException Thrown if the offset command fails.
+	 * @see #rotator
+	 */
+	public void rotator(String rotatorMode, double mountAngle) throws TOCException
+	{
+		rotator.setRotatorMode(rotatorMode);
+		rotator.setMountAngle(mountAngle);
+		rotator.run();
+		if(rotator.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":rotator failed:"+rotator.getErrorString());
+		}
+	}
+
+	/**
 	 * Switch the autoguider on or off after starting a RCS TOCA session using helo.
 	 * You should have called <b>helo</b> and <b>slew</b> before this method. 
 	 * @param on A boolean, if "true" turn the autoguider on, otherwise turn it off.
@@ -434,17 +480,20 @@ public class TOCSession implements Logging
 	 * @param ra The right ascension to acquire to.
 	 * @param dec The declination to acquire to.
 	 * @param acquireMode Which method to use to acquire.
+	 * @param highPrecision A boolean, if true we do a HIGH precision acquisition, 
+	 *                      otherwise we do a NORMAL acquisition.
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @see #acquire
 	 * @see #ACQUIRE_MODE_NONE
 	 * @see #ACQUIRE_MODE_BRIGHTEST
 	 * @see #ACQUIRE_MODE_WCS
 	 */
-	public void acquire(RA ra,Dec dec,String acquireMode) throws TOCException
+	public void acquire(RA ra,Dec dec,String acquireMode,boolean highPrecision) throws TOCException
 	{
 		acquire.setRA(ra);
 		acquire.setDec(dec);
 		acquire.setAcquireMode(acquireMode);
+		acquire.setPrecision(highPrecision);
 		acquire.run();
 		if(acquire.getSuccessful() == false)
 		{
@@ -458,6 +507,7 @@ public class TOCSession implements Logging
 	 * @param raString A string representing the right ascension, in the format HH:MM:SS.ss.
 	 * @param decString A string representing the declination, in the format [+|-]DD:MM:SS.ss.
 	 * @param acquireMode Which method to use to acquire.
+	 * @param precisionString The precision to use when acquiring, one of "NORMAL" or "HIGH".
 	 * @exception TOCException Thrown if the slew command fails.
 	 * @exception NumberFormatException Thrown if the RA/Dec parsing fails.
 	 * @see #acquire
@@ -465,16 +515,35 @@ public class TOCSession implements Logging
 	 * @see #ACQUIRE_MODE_BRIGHTEST
 	 * @see #ACQUIRE_MODE_WCS
 	 */
-	public void acquire(String raString,String decString,String acquireMode) throws TOCException, 
-											NumberFormatException
+	public void acquire(String raString,String decString,String acquireMode,String precisionString) throws
+		TOCException, NumberFormatException
 	{
 		acquire.setRA(raString);
 		acquire.setDec(decString);
 		acquire.setAcquireMode(acquireMode);
+		acquire.setPrecision(precisionString);
 		acquire.run();
 		if(acquire.getSuccessful() == false)
 		{
 			throw new TOCException(this.getClass().getName()+":acquire failed:"+acquire.getErrorString());
+		}
+	}
+
+	/**
+	 * Configure the focal plane (telescope aperture offset) for an instrument.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param instrumentName The name of the instrument.
+	 * @exception TOCException Thrown if the focal plane command fails.
+	 * @see #focalPlane
+	 */
+	public void focalPlane(String instrumentName) throws TOCException
+	{
+		focalPlane.setInstrumentName(instrumentName);
+		focalPlane.run();
+		if(focalPlane.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":focal plane failed:"+
+					       focalPlane.getErrorString());
 		}
 	}
 
@@ -698,7 +767,34 @@ public class TOCSession implements Logging
 	{
 		instr("NUVSPEC",wavelengthString,null,null,1,1,calibrateBefore,calibrateAfter);
 	}
-
+	
+	/**
+	 * Configure the SPRAT instrument, and make it the current TOCA instrument.
+	 * You should have called <b>helo</b> before this method. 
+	 * @param slitPositionString Whether the slit should be "in" or "out" of the beam.
+	 * @param grismPositionString Whether the grism should be "in" or "out" of the beam.
+	 * @param grismRotationString Whether the grism should be rotated to the "red" or "blue" position.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrSprat(String slitPositionString,String grismPositionString,String grismRotationString,
+			       boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("SPRAT");
+		instr.setSlitPosition(slitPositionString);
+		instr.setGrismPosition(grismPositionString);
+		instr.setGrismRotation(grismRotationString);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+	
 	/**
 	 * Configure the RINGOSTAR instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
@@ -859,6 +955,23 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Take an Arc with the currently selected instrument.
+	 * You should have called <b>helo</b>, <b>slew</b> and <b>instr</b> before this method. 
+	 * @param lampName The name of the lamp to use.
+	 * @exception TOCException Thrown if the arc command fails.
+	 * @see #arc
+	 */
+	public void arc(String lampName) throws TOCException
+	{
+		arc.setLampName(lampName);
+		arc.run();
+		if(arc.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":arc failed:"+arc.getErrorString());
+		}
+	}
+
+	/**
 	 * Stop the telescope, if it is slewing/tracking.
 	 * You should have called <b>helo</b> before this method. 
 	 * @exception TOCException Thrown if the stop command fails.
@@ -965,6 +1078,27 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Get the number of filenames generated by the last arc command.
+	 * @return The number of filenames, or 0 if no arc command has occured yet.
+	 * @see #arc
+	 */
+	public int getArcFilenameCount()
+	{
+		return arc.getFilenameCount();
+	}
+
+	/**
+	 * Get the ith filenames generated by the last arc command.
+	 * @param i The index in the list of filenames.
+	 * @return The filename (on the RCS machine (occ)).
+	 * @see #arc
+	 */
+	public String getArcFilename(int i)
+	{
+		return arc.getFilename(i);
+	}
+
+	/**
 	 * Initialise org.estar.toop loggers. A static method - no session has to be instantiated to call this.
 	 * @param handler The log handler to point the loggers to.
 	 * @param logLevel The log level to set the loggers to.
@@ -985,10 +1119,16 @@ public class TOCSession implements Logging
 		l = LogManager.getLogger("org.estar.toop.AgRadial");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Arc");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Auto");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Expose");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.FocalPlane");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Helo");
@@ -1007,6 +1147,9 @@ public class TOCSession implements Logging
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Quit");
+		l.setLogLevel(logLevel);	
+		l.addHandler(handler);
+		l = LogManager.getLogger("org.estar.toop.Rotator");
 		l.setLogLevel(logLevel);	
 		l.addHandler(handler);
 		l = LogManager.getLogger("org.estar.toop.Slew");
