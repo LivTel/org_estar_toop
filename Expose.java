@@ -223,28 +223,37 @@ public class Expose extends TOCCommand implements Logging, Runnable
 						done = true;
 					}
 				}
-				// seeing
-				seeing = getReplyValueDouble("seeing");
-				sessionData.setProperty(".expose.seeing",""+seeing);
-				// counts
-				counts = getReplyValueInt("counts");
-				sessionData.setProperty(".expose.counts",""+counts);
-				// photometric
-				photometric = getReplyValueDouble("photom");
-				sessionData.setProperty(".expose.photometric",""+photometric);
-				// skyBrightness
-				skyBrightness = getReplyValueDouble("skybright");
-				sessionData.setProperty(".expose.sky_brightness",""+skyBrightness);
-				// xPix
-				xPix = getReplyValueDouble("xpix");
-				sessionData.setProperty(".expose.xpix",""+xPix);
-				// yPix
-				yPix = getReplyValueDouble("ypix");
-				sessionData.setProperty(".expose.ypix",""+yPix);
-				// logging
-				logger.log(INFO, 1, CLASS, RCSID,"run","Expose successful with seeing : "+seeing+
-					   ", counts : "+counts+", photometric : "+photometric+
-					   ", xpix : "+xPix+", ypix : "+yPix+".");
+				// The next set of data is only returned if the data pipeline flag is set
+				if(dataPipelineFlag)
+				{
+					// seeing
+					seeing = getReplyValueDouble("seeing");
+					sessionData.setProperty(".expose.seeing",""+seeing);
+					// counts
+					counts = getReplyValueInt("counts");
+					sessionData.setProperty(".expose.counts",""+counts);
+					// photometric
+					photometric = getReplyValueDouble("photom");
+					sessionData.setProperty(".expose.photometric",""+photometric);
+					// skyBrightness
+					skyBrightness = getReplyValueDouble("skybright");
+					sessionData.setProperty(".expose.sky_brightness",""+skyBrightness);
+					// xPix
+					xPix = getReplyValueDouble("xpix");
+					sessionData.setProperty(".expose.xpix",""+xPix);
+					// yPix
+					yPix = getReplyValueDouble("ypix");
+					sessionData.setProperty(".expose.ypix",""+yPix);
+					// logging
+					logger.log(INFO, 1, CLASS, RCSID,"run","Expose successful with seeing : "+seeing+
+						   ", counts : "+counts+", photometric : "+photometric+
+						   ", xpix : "+xPix+", ypix : "+yPix+".");
+				}
+				else
+				{
+					// logging
+					logger.log(INFO, 1, CLASS, RCSID,"run","Expose successful.");
+				}
 			}
 			catch(NGATPropertyException e)
 			{
