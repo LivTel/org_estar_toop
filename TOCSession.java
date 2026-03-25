@@ -737,6 +737,33 @@ public class TOCSession implements Logging
 	}
 
 	/**
+	 * Configure the LOCI instrument, and make it the current TOCA instrument
+	 * You should have called <b>helo</b> before this method. 
+	 * @param filterType A string representing the filter type string, i.e. SDSS-R.
+	 * @param xBin How to bin the chip in X.
+	 * @param yBin How to bin the chip in Y.
+	 * @param calibrateBefore Whether to do calibration frames before using this configuration.
+	 * @param calibrateAfter Whether to do calibration frames after using this configuration.
+	 * @exception TOCException Thrown if the instr command fails.
+	 * @see #instr
+	 */
+	public void instrLoci(String filterType,int xBin,int yBin,
+				boolean calibrateBefore,boolean calibrateAfter) throws TOCException
+	{
+		instr.setInstId("LOCI");
+		instr.setSingleFilter(filterType);
+		instr.setXBinning(xBin);
+		instr.setYBinning(yBin);
+		instr.setCalibrateBefore(calibrateBefore);
+		instr.setCalibrateAfter(calibrateAfter);
+		instr.run();
+		if(instr.getSuccessful() == false)
+		{
+			throw new TOCException(this.getClass().getName()+":instr failed:"+instr.getErrorString());
+		}
+	}
+
+	/**
 	 * Configure the FIXEDSPEC instrument, and make it the current TOCA instrument
 	 * You should have called <b>helo</b> before this method. 
 	 * @param xBin How to bin the chip in X.

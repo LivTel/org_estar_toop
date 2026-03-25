@@ -503,6 +503,20 @@ class Instr extends TOCCommand implements Logging, Runnable
 			commandString = new String(commandString+nudgematicOffsetSize+" "+coaddExposureLength+" "+
 						   filterList[SINGLE_FILTER_INDEX]);
 		}
+		else if(instID.equals("LOCI"))
+		{
+			if(xBinning != yBinning)
+			{
+				successful = false;
+				errorString = new String(this.getClass().getName()+
+							 ":run:X binning "+xBinning+" does not match Y binning "+
+							 yBinning+".");
+				logger.log(INFO, 1, CLASS, RCSID,"run",errorString);
+				return;
+			}
+			// INSTR <session id> LOCI <filter> <bin>
+			commandString = new String(commandString+filterList[SINGLE_FILTER_INDEX]+" "+xBinning);
+		}
 		else if(instID.equals("IO:THOR"))
 		{
 			// INSTR <sessionId> IO:THOR <emgain> <binxy> <xs> <xe> <ys> <ye> 
@@ -592,6 +606,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 			//System.out.println("Additional parameters for RINGO3 : - [<trigger type> <emgain> <bin>].");
 			//System.out.println("Additional parameters for IO:THOR : - <emgain> <bin> <xs> <ys> <xe> <ye>].");
 			System.out.println("Additional parameters for LIRIC : - [<nudgematicOffsetSize> <coaddExposureLength> <filter>].");
+			System.out.println("Additional parameters for LOCI : - [<single filter> <bin>].");
 			System.out.println("Additional parameters for MOPTOP : - [<rotorSpeed> <filter> <bin>].");
 			System.out.println("Additional parameters for RISE : - [<bin>].");
 			System.out.println("Additional parameters for SPRAT : - [<slit position> <grism position> <grism rotation>].");
@@ -718,6 +733,20 @@ class Instr extends TOCCommand implements Logging, Runnable
 			calibrateBeforeString = args[5];
 			calibrateAfterString = args[6];
 		}
+		else if(instID.equals("LOCI"))
+		{
+			// <single filter> <bin>
+			if(args.length != 6)
+			{
+				System.err.println("Wrong number of arguments: "+args.length+".");
+				System.exit(1);
+			}
+			singleFilterString = args[2];
+			xBinningString = args[3];
+			yBinningString = args[3];
+			calibrateBeforeString = args[4];
+			calibrateAfterString = args[5];
+		}
 		else if(instID.equals("RISE"))
 		{
 			// <bin>
@@ -748,7 +777,7 @@ class Instr extends TOCCommand implements Logging, Runnable
 		// diddly FrodoSpec
 		else
 		{
-			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP, LIRIC.");
+			System.out.println("Instrument ID must be one of RATCAM,IRCAM,IO:O, FIXEDSPEC, RINGO3, IO:THOR, MOPTOP, LIRIC, LOCI.");
 			System.exit(1);
 		}
 		// convert emGain strings into number
